@@ -1,0 +1,2576 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISS Global Forwarding | Operations Terminal</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+<style>
+:root {
+  --bg:#111111; --sidebar:#1A1A1A; --card:#2B2B2B; --border:#404040;
+  --text:#f1f5f9; --subtext:#94a3b8; --accent:#D32F2F; --accent2:#B71C1C;
+  --green:#22c55e; --red:#ef4444; --blue:#3b82f6; --yellow:#f59e0b;
+  --chat-bg:#0d1422;
+}
+.light-mode {
+  --bg:#f1f5f9; --sidebar:#ffffff; --card:#f8fafc; --border:#e2e8f0;
+  --text:#0f172a; --subtext:#475569; --chat-bg:#e8edf5;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
+
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(249,115,22,.07),transparent);}
+.login-box{width:100%;max-width:480px;background:var(--sidebar);border:1px solid var(--border);
+  border-radius:20px;padding:34px 30px;box-shadow:0 30px 70px rgba(0,0,0,.45);position:relative;overflow:hidden;}
+.login-box::before{content:'';position:absolute;top:-1px;left:15%;right:15%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+.logo-wrap{text-align:center;margin-bottom:28px;}
+.brand-logo{width:min(100%,340px);height:auto;display:block;margin:0 auto 18px;background:#fff;border-radius:12px;padding:10px;border:1px solid var(--border);}
+.logo-wrap .company-name{font-size:22px;font-weight:800;color:var(--text);margin-top:8px;letter-spacing:-.3px;}
+.logo-wrap p{color:var(--subtext);font-size:13px;margin-top:4px;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;margin-bottom:7px;color:var(--subtext);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.form-control{width:100%;padding:13px 15px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--text);outline:none;font-size:14px;transition:border-color .2s;}
+.form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(249,115,22,.12);}
+.form-control option{background:var(--card);}
+.login-btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .2s;letter-spacing:.02em;}
+.login-btn:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 10px 28px rgba(249,115,22,.35);}
+.login-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);margin-top:12px;display:none;}
+
+/* DASHBOARD SHELL */
+.dashboard{display:none;}
+.sidebar{width:260px;height:100vh;position:fixed;left:0;top:0;background:var(--sidebar);
+  border-right:1px solid var(--border);padding:20px;overflow-y:auto;z-index:1000;transition:transform .3s;}
+.sidebar-logo{margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.sidebar-brand{min-width:0;display:flex;align-items:center;gap:10px;}
+.sidebar-logo-img{width:78px;height:42px;object-fit:contain;background:#fff;border-radius:8px;padding:5px;flex-shrink:0;}
+.sidebar-co-name{font-size:13px;font-weight:800;color:var(--text);line-height:1.2;}
+.sidebar-co-sub{font-size:10px;color:var(--subtext);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;}
+.close-sidebar-btn{display:none;background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;}
+.sidebar ul{list-style:none;}
+.sidebar ul li{padding:12px 14px;border-radius:12px;margin-bottom:4px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;gap:11px;font-size:14px;color:var(--subtext);}
+.sidebar ul li:hover,.active-menu{background:var(--card)!important;color:var(--accent)!important;}
+.sidebar ul li i{width:16px;text-align:center;}
+.sidebar ul li.disabled-menu{opacity:.45;cursor:not-allowed;}
+.sidebar ul li.disabled-menu:hover{background:transparent!important;color:var(--subtext)!important;}
+.sidebar-section{font-size:10px;font-weight:700;color:var(--subtext);text-transform:uppercase;
+  letter-spacing:.1em;padding:14px 14px 6px;}
+.hidden-admin{display:none;}
+
+/* MAIN */
+.main{margin-left:260px;width:calc(100% - 260px);min-height:100vh;display:flex;flex-direction:column;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;
+  border-bottom:1px solid var(--border);background:var(--sidebar);position:sticky;top:0;z-index:50;gap:12px;}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.menu-toggle-btn{display:none;background:var(--card);border:1px solid var(--border);color:var(--text);
+  padding:10px 12px;border-radius:10px;cursor:pointer;font-size:16px;}
+.topbar-title{font-size:18px;font-weight:700;}
+.live-clock{color:var(--subtext);font-size:12px;margin-top:2px;font-family:monospace;}
+.topbar-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.search-box{width:220px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;
+  background:var(--card);color:var(--text);outline:none;font-size:13px;}
+.search-box:focus{border-color:var(--accent);}
+.icon-btn{border:1px solid var(--border);background:var(--card);padding:10px 13px;border-radius:10px;
+  color:var(--text);cursor:pointer;font-size:15px;transition:.15s;position:relative;}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);}
+.content{flex:1;padding:24px;overflow-y:auto;max-width:none;width:100%;align-self:stretch;}
+.page{display:none;animation:fadeIn .25s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* KPI CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:22px;}
+.card{background:var(--sidebar);border:1px solid var(--border);border-radius:16px;padding:18px 20px;
+  position:relative;overflow:hidden;transition:transform .15s,border-color .15s;}
+.card:hover{transform:translateY(-2px);border-color:var(--accent);}
+.card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent-line,var(--accent));opacity:.4;}
+.card h3{color:var(--subtext);font-size:11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:600;}
+.card p{font-size:28px;font-weight:800;margin-bottom:3px;}
+.card small{color:var(--subtext);font-size:12px;}
+.c-green{--accent-line:var(--green);} .c-orange{--accent-line:var(--accent);}
+.c-blue{--accent-line:var(--blue);} .c-red{--accent-line:var(--red);}
+
+/* TABLE */
+.box{background:var(--sidebar);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px;}
+.box-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+.box-title{font-size:16px;font-weight:700;}
+.table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:560px;}
+table th,table td{padding:13px 14px;border-bottom:1px solid var(--border);text-align:left;font-size:13px;}
+table th{color:var(--subtext);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;background:var(--card);}
+table tr:last-child td{border-bottom:none;}
+table tr:hover td{background:rgba(255,255,255,.025);}
+.status{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;display:inline-block;}
+.s-green{background:rgba(34,197,94,.12);color:var(--green);}
+.s-red{background:rgba(239,68,68,.12);color:var(--red);}
+.s-blue{background:rgba(59,130,246,.12);color:var(--blue);}
+.s-yellow{background:rgba(245,158,11,.12);color:var(--yellow);}
+.s-orange{background:rgba(249,115,22,.12);color:var(--accent);}
+
+/* GRID LAYOUTS */
+.g2{display:grid;grid-template-columns:2fr 1fr;gap:18px;}
+.g2b{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+
+/* FORM FIELDS */
+.field-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px;}
+.field label{font-size:11px;color:var(--subtext);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.field input,.field select,.field textarea{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit;transition:border-color .2s;}
+.field input:disabled{cursor:not-allowed;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field select option{background:var(--card);}
+.btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:8px 16px;
+  border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;transition:all .15s;font-family:inherit;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+.btn-sm{font-size:11px;padding:5px 11px;border-radius:7px;}
+.btn-danger{border-color:var(--red);color:var(--red);}
+.btn-danger:hover{background:rgba(239,68,68,.1);}
+.success-msg{font-size:13px;color:var(--green);margin-left:12px;display:none;}
+
+/* LIVE ALERTS FEED */
+.feed{display:flex;flex-direction:column;gap:10px;}
+.feed-item{background:var(--card);border-left:3px solid var(--accent);padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.45;animation:fadeIn .35s ease;}
+.feed-item.alert-red{border-left-color:var(--red);}
+.feed-item.alert-green{border-left-color:var(--green);}
+.feed-time{font-size:11px;color:var(--subtext);font-family:monospace;margin-bottom:3px;}
+
+/* PROGRESS BARS */
+.prog-wrap{margin-bottom:14px;}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;color:var(--subtext);margin-bottom:5px;}
+.prog-bar{height:6px;background:var(--card);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .6s ease;}
+
+/* AI ASSISTANT */
+.ai-suggestion-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.ai-suggestion{background:var(--card);border-left:3px solid var(--accent);border-radius:10px;padding:11px 13px;font-size:13px;line-height:1.45;color:var(--text);}
+.ai-suggestion strong{display:block;font-size:12px;color:var(--accent);margin-bottom:2px;}
+.ai-chat-box{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--chat-bg);}
+.ai-chat-messages{height:190px;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:9px;}
+.ai-msg{font-size:13px;line-height:1.45;padding:9px 11px;border-radius:11px;background:var(--card);}
+.ai-msg.user{align-self:flex-end;background:var(--accent);color:#fff;}
+.ai-msg.bot{align-self:flex-start;color:var(--text);}
+.ai-chat-input{display:flex;border-top:1px solid var(--border);background:var(--sidebar);}
+.ai-chat-input input{flex:1;min-width:0;background:transparent;border:none;color:var(--text);padding:11px 12px;outline:none;font-family:inherit;font-size:13px;}
+.ai-chat-input button{border:none;background:var(--accent);color:#fff;padding:0 14px;cursor:pointer;}
+
+
+/* INLINE EDITABLE TABLE CELLS */
+td[contenteditable="true"]{
+  outline:none;cursor:text;border-radius:5px;padding:5px 8px;
+  transition:background .15s;min-width:60px;
+}
+td[contenteditable="true"]:hover{background:rgba(255,255,255,.06);}
+td[contenteditable="true"]:focus{background:rgba(249,115,22,.12);box-shadow:0 0 0 2px rgba(249,115,22,.35);}
+.light-mode td[contenteditable="true"]:hover{background:rgba(0,0,0,.04);}
+.light-mode td[contenteditable="true"]:focus{background:rgba(211,47,47,.08);box-shadow:0 0 0 2px rgba(211,47,47,.2);}
+.edit-hint{font-size:11px;color:var(--subtext);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+/* status select inside table */
+.status-select{background:transparent;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;outline:none;padding:0;color:inherit;}
+/* pending row */
+.pend-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card);border-radius:10px;margin-bottom:8px;gap:10px;flex-wrap:wrap;}
+.pend-info{display:flex;flex-direction:column;gap:2px;}
+.pend-name{font-size:13px;font-weight:600;}
+.pend-meta{font-size:11px;color:var(--subtext);}
+.pend-actions{display:flex;gap:8px;}
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.setting-card{background:var(--sidebar);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.setting-card h3{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.setting-row:last-child{border-bottom:none;}
+.setting-label{font-size:13px;}
+.setting-sub{font-size:11px;color:var(--subtext);margin-top:2px;}
+.toggle{position:relative;width:42px;height:24px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:24px;transition:.2s;}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+.toggle input:checked+.toggle-slider{background:var(--accent);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px);}
+.color-swatch{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);cursor:pointer;transition:.15s;}
+.color-swatch:hover,.color-swatch.active{border-color:var(--text);transform:scale(1.15);}
+
+/* ENTERPRISE CONTROL CENTER */
+:root{
+  --glass:rgba(255,255,255,.075);
+  --glass-strong:rgba(255,255,255,.105);
+  --soft-border:rgba(255,255,255,.12);
+  --shadow-lg:0 24px 70px rgba(0,0,0,.32);
+}
+.light-mode{
+  --glass:rgba(255,255,255,.86);
+  --glass-strong:rgba(255,255,255,.94);
+  --soft-border:rgba(15,23,42,.12);
+  --shadow-lg:0 18px 48px rgba(15,23,42,.12);
+}
+body{background:
+  radial-gradient(circle at 15% 12%,rgba(211,47,47,.18),transparent 28%),
+  radial-gradient(circle at 78% 8%,rgba(59,130,246,.12),transparent 30%),
+  linear-gradient(135deg,#080b10 0%,#111827 48%,#15100f 100%);
+}
+.light-mode body,body.light-mode{background:
+  radial-gradient(circle at 14% 10%,rgba(211,47,47,.10),transparent 30%),
+  radial-gradient(circle at 82% 8%,rgba(59,130,246,.10),transparent 32%),
+  linear-gradient(135deg,#f8fafc 0%,#eef2f7 52%,#fff7f7 100%);
+}
+.sidebar{background:rgba(12,16,24,.82);backdrop-filter:blur(18px);border-right:1px solid var(--soft-border);box-shadow:12px 0 45px rgba(0,0,0,.18);}
+.light-mode .sidebar{background:rgba(255,255,255,.88);box-shadow:12px 0 36px rgba(15,23,42,.08);}
+.sidebar ul li{border:1px solid transparent;}
+.sidebar ul li:hover,.active-menu{background:rgba(211,47,47,.12)!important;border-color:rgba(211,47,47,.22);box-shadow:0 8px 24px rgba(0,0,0,.16);}
+.main{background:transparent;}
+.topbar{background:rgba(12,16,24,.76);backdrop-filter:blur(18px);border-bottom:1px solid var(--soft-border);}
+.light-mode .topbar{background:rgba(255,255,255,.86);}
+.content{padding:28px;max-width:1680px;margin:0 auto;}
+.box,.card,.setting-card{background:var(--glass);border:1px solid var(--soft-border);backdrop-filter:blur(18px);box-shadow:0 18px 48px rgba(0,0,0,.18);border-radius:18px;}
+.light-mode .box,.light-mode .card,.light-mode .setting-card{box-shadow:0 16px 42px rgba(15,23,42,.10);}
+.card{min-height:126px;}
+.card:hover,.box:hover{border-color:rgba(211,47,47,.32);}
+.enterprise-dashboard{display:flex;flex-direction:column;gap:20px;}
+.welcome-hero{position:relative;overflow:hidden;border:1px solid var(--soft-border);background:linear-gradient(135deg,rgba(211,47,47,.18),rgba(15,23,42,.84) 42%,rgba(59,130,246,.13));border-radius:24px;padding:24px;box-shadow:var(--shadow-lg);}
+.light-mode .welcome-hero{background:linear-gradient(135deg,rgba(211,47,47,.12),rgba(255,255,255,.88) 45%,rgba(59,130,246,.10));}
+.welcome-hero:after{content:'';position:absolute;right:-120px;top:-120px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.06);}
+.welcome-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.4fr .8fr;gap:20px;align-items:center;}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#cbd5e1;font-weight:800;margin-bottom:8px;}
+.light-mode .eyebrow{color:#64748b;}
+.welcome-title{font-size:32px;line-height:1.1;font-weight:850;letter-spacing:0;margin-bottom:9px;}
+.welcome-copy{color:var(--subtext);font-size:14px;line-height:1.7;max-width:720px;}
+.ops-status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.ops-pill{background:rgba(255,255,255,.08);border:1px solid var(--soft-border);border-radius:14px;padding:12px;}
+.ops-pill span{display:block;font-size:11px;color:var(--subtext);margin-bottom:5px;}
+.ops-pill strong{font-size:15px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:14px;}
+.kpi-card{background:var(--glass);border:1px solid var(--soft-border);border-radius:18px;padding:16px;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.16);transition:transform .18s,border-color .18s;}
+.kpi-card:hover{transform:translateY(-3px);border-color:rgba(211,47,47,.36);}
+.kpi-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px;}
+.kpi-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(211,47,47,.16);color:#ff8a80;}
+.kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--subtext);font-weight:800;}
+.kpi-value{font-size:28px;font-weight:850;letter-spacing:0;}
+.kpi-trend{font-size:11px;color:var(--subtext);display:flex;align-items:center;gap:5px;margin-top:4px;}
+.trend-up{color:var(--green)}.trend-warn{color:var(--yellow)}.trend-down{color:var(--red)}
+.dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;}
+.analytics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.metric-chart{height:190px;display:flex;align-items:flex-end;gap:10px;padding-top:14px;}
+.chart-bar{flex:1;min-width:18px;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,var(--accent),rgba(211,47,47,.22));position:relative;transition:height .35s ease;}
+.chart-bar span{position:absolute;left:50%;bottom:-24px;transform:translateX(-50%);font-size:10px;color:var(--subtext);}
+.chart-line{height:190px;display:flex;align-items:flex-end;gap:12px;padding-top:12px;}
+.chart-point{flex:1;border-radius:999px;background:linear-gradient(180deg,#60a5fa,#1d4ed8);min-height:20px;position:relative;}
+.rank-list,.timeline-list,.quick-actions,.expense-list,.notif-list-lite{display:flex;flex-direction:column;gap:10px;}
+.rank-item,.timeline-item,.expense-item,.notif-lite{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:11px 12px;font-size:13px;}
+.light-mode .rank-item,.light-mode .timeline-item,.light-mode .expense-item,.light-mode .notif-lite{background:rgba(15,23,42,.035);border-color:rgba(15,23,42,.08);}
+.rank-meta,.timeline-meta,.expense-meta{min-width:0;}
+.rank-meta strong,.timeline-meta strong,.expense-meta strong{display:block;font-size:13px;}
+.rank-meta span,.timeline-meta span,.expense-meta span{display:block;font-size:11px;color:var(--subtext);margin-top:2px;}
+.score-badge{font-size:12px;font-weight:800;color:var(--green);background:rgba(34,197,94,.12);padding:5px 9px;border-radius:999px;}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.quick-action{justify-content:center;padding:12px;border-radius:14px;background:rgba(255,255,255,.06);}
+.ai-insight-card{background:linear-gradient(135deg,rgba(211,47,47,.16),rgba(59,130,246,.10));}
+.ai-suggestion{background:rgba(255,255,255,.06);border-color:rgba(211,47,47,.55);}
+.floating-ai-btn{position:fixed;right:24px;bottom:24px;width:58px;height:58px;border-radius:18px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(135deg,var(--accent),#7f1d1d);color:#fff;box-shadow:0 18px 45px rgba(211,47,47,.34);z-index:450;display:none;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:transform .2s;}
+.floating-ai-btn:hover{transform:translateY(-3px) scale(1.03);}
+.floating-ai-panel{position:fixed;right:24px;bottom:92px;width:min(390px,calc(100vw - 32px));height:520px;max-height:calc(100vh - 130px);z-index:451;display:none;flex-direction:column;border:1px solid var(--soft-border);border-radius:22px;background:rgba(13,20,34,.94);backdrop-filter:blur(20px);box-shadow:var(--shadow-lg);overflow:hidden;}
+.light-mode .floating-ai-panel{background:rgba(255,255,255,.96);}
+.floating-ai-panel.open{display:flex;animation:fadeIn .18s ease;}
+.floating-ai-head{padding:15px 16px;border-bottom:1px solid var(--soft-border);display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.045);}
+.floating-ai-avatar{width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(211,47,47,.18);color:#ff8a80;}
+.floating-ai-title{font-weight:800;font-size:14px;}
+.floating-ai-sub{font-size:11px;color:var(--subtext);margin-top:2px;}
+.floating-ai-close{margin-left:auto;background:transparent;border:none;color:var(--subtext);cursor:pointer;font-size:16px;}
+.floating-ai-panel .ai-chat-box{border:none;border-radius:0;display:flex;flex-direction:column;min-height:0;flex:1;}
+.floating-ai-panel .ai-chat-messages{height:auto;flex:1;}
+.floating-ai-panel .ai-chat-input{min-height:50px;}
+
+/* CHAT */
+.chat-page-wrap{display:grid;grid-template-columns:220px 1fr;gap:0;height:calc(100vh - 160px);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.chat-channels{background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:12px 0;}
+.channel-head{padding:10px 16px;font-size:11px;font-weight:700;color:var(--subtext);text-transform:uppercase;letter-spacing:.08em;}
+.channel-item{padding:12px 16px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--subtext);border-left:3px solid transparent;position:relative;}
+.channel-item:hover{background:var(--card);color:var(--text);}
+.channel-item.ch-active{background:var(--card);color:var(--accent);border-left-color:var(--accent);}
+.channel-item .ch-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ch-ops .ch-icon{background:rgba(249,115,22,.15);color:var(--accent);}
+.ch-driver .ch-icon{background:rgba(34,197,94,.15);color:var(--green);}
+.ch-admin .ch-icon{background:rgba(59,130,246,.15);color:var(--blue);}
+.ch-badge{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;}
+.chat-main{display:flex;flex-direction:column;background:var(--chat-bg);}
+.chat-main-head{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--sidebar);display:flex;align-items:center;gap:12px;}
+.chat-main-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.chat-main-name{font-size:14px;font-weight:700;}
+.chat-main-sub{font-size:11px;color:var(--subtext);margin-top:2px;}
+.chat-online{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);margin-left:auto;}
+.chat-online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
+.chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.chat-body::-webkit-scrollbar{width:4px;}
+.chat-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.cmsg{max-width:78%;display:flex;flex-direction:column;gap:2px;}
+.cmsg-bubble{padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.45;}
+.cmsg-meta{font-size:10px;color:var(--subtext);display:flex;gap:6px;}
+.cmsg-sender{font-weight:600;color:var(--subtext);}
+.cmsg.me{align-self:flex-end;align-items:flex-end;}
+.cmsg.me .cmsg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.cmsg.other{align-self:flex-start;}
+.cmsg.other .cmsg-bubble{background:var(--card);color:var(--text);border-bottom-left-radius:4px;}
+.cmsg.sys{align-self:center;}
+.cmsg.sys .cmsg-bubble{background:transparent;color:var(--subtext);font-size:11px;padding:2px 8px;}
+.chat-footer{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--sidebar);}
+.chat-footer input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--text);outline:none;font-family:inherit;}
+.chat-footer input:focus{border-color:var(--accent);}
+.chat-footer button{background:var(--accent);border:none;border-radius:10px;padding:10px 14px;color:#fff;cursor:pointer;font-size:14px;}
+.chat-footer button:hover{background:var(--accent2);}
+
+/* GPS COMING SOON */
+.gps-coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:340px;background:var(--card);border:2px dashed var(--border);border-radius:16px;
+  text-align:center;padding:40px;gap:16px;}
+.gps-coming-soon .icon{font-size:52px;color:var(--accent);opacity:.5;}
+.gps-coming-soon h2{font-size:20px;font-weight:700;color:var(--subtext);}
+.gps-coming-soon p{font-size:13px;color:var(--subtext);max-width:380px;line-height:1.6;}
+
+/* NOTIFICATION DROPDOWN */
+.notif-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:340px;background:var(--sidebar);
+  border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  z-index:200;overflow:hidden;display:none;}
+.notif-dropdown.open{display:block;animation:fadeIn .2s ease;}
+.notif-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.notif-head span{font-size:14px;font-weight:700;}
+.notif-clear{font-size:12px;color:var(--accent);cursor:pointer;background:none;border:none;font-family:inherit;}
+.notif-list{max-height:320px;overflow-y:auto;}
+.notif-item{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:.15s;}
+.notif-item:hover{background:var(--card);}
+.notif-item:last-child{border-bottom:none;}
+.notif-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.notif-text{font-size:12px;line-height:1.5;color:var(--text);}
+.notif-time{font-size:11px;color:var(--subtext);margin-top:2px;}
+.notif-unread{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px;}
+.notif-wrap{position:relative;}
+
+/* PROFILE DROPDOWN */
+.profile-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:280px;background:var(--sidebar);
+  border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.5);
+  z-index:200;overflow:hidden;display:none;}
+.profile-dropdown.open{display:block;animation:fadeIn .2s ease;}
+.profile-header{padding:18px;border-bottom:1px solid var(--border);text-align:center;}
+.profile-avatar{width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;margin:0 auto 10px;}
+.profile-name{font-size:15px;font-weight:700;}
+.profile-role{font-size:12px;color:var(--subtext);margin-top:3px;}
+.profile-actions{padding:10px;}
+.profile-action-item{padding:10px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px;transition:.15s;color:var(--text);}
+.profile-action-item:hover{background:var(--card);}
+.profile-action-item.danger{color:var(--red);}
+.profile-action-item i{width:18px;text-align:center;color:var(--subtext);}
+.profile-action-item.danger i{color:var(--red);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--sidebar);border:1px solid var(--border);border-radius:18px;padding:28px;width:calc(100% - 32px);max-width:520px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 30px 70px rgba(0,0,0,.5);}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.modal-close{position:absolute;top:18px;right:18px;background:none;border:none;color:var(--subtext);font-size:18px;cursor:pointer;}
+.modal-close:hover{color:var(--red);}
+.modal-footer{margin-top:20px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
+
+/* SIDEBAR OVERLAY */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;}
+
+/* RESPONSIVE */
+@media(max-width:1280px){.kpi-grid{grid-template-columns:repeat(3,1fr);}.dashboard-grid{grid-template-columns:1fr;}.welcome-grid{grid-template-columns:1fr;}}
+@media(max-width:1024px){.g2{grid-template-columns:1fr;}.g3{grid-template-columns:1fr 1fr;}.analytics-grid{grid-template-columns:1fr;}}
+@media(max-width:768px){
+  .login-page{align-items:flex-start;padding:16px;}
+  .login-box{padding:24px 18px;border-radius:16px;}
+  .brand-logo{max-width:280px;padding:8px;}
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .close-sidebar-btn,.menu-toggle-btn{display:block!important;}
+  .main{margin-left:0;width:100%;}
+  .topbar{align-items:flex-start;padding:14px;position:sticky;}
+  .topbar-right{width:100%;justify-content:flex-start;}
+  .search-box{width:100%;order:10;}
+  .content{padding:16px;}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .kpi-grid,.ops-status-grid,.quick-actions{grid-template-columns:1fr;}
+  .welcome-title{font-size:24px;}
+  .floating-ai-btn{right:16px;bottom:16px;}
+  .floating-ai-panel{right:16px;bottom:84px;}
+  .g2b,.g3,.settings-grid{grid-template-columns:1fr;}
+  .chat-page-wrap{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr;}
+  .card{padding:16px;}
+  .card p{font-size:24px;}
+  .box{padding:16px;border-radius:12px;}
+  .field-row{gap:10px;}
+  .field{min-width:100%;}
+  .notif-dropdown,.profile-dropdown{position:fixed;top:72px;left:12px;right:12px;width:auto;}
+  table{min-width:640px;}
+  .chat-channels{flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);}
+  .channel-item{flex-direction:column;padding:8px;border-left:none;border-bottom:3px solid transparent;font-size:11px;}
+  .channel-item.ch-active{border-bottom-color:var(--accent);border-left:none;}
+  .chat-page-wrap{height:calc(100vh - 210px);}
+  .modal{padding:22px 16px;}
+}
+</style>
+<script>
+window.ISS_STORAGE_API = window.ISS_STORAGE_API || (location.protocol === "file:" ? "" : location.origin + "/api");
+</script>
+</head>
+<body>
+
+<!-- â•â•â• LOGIN â•â•â• -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <div class="logo-wrap">
+      <img class="brand-logo" src="assets/iss-logo.jpg" alt="ISS Global Forwarding logo">
+      <div class="company-name">ISS Global Forwarding</div>
+      <p>Operations Terminal</p>
+    </div>
+
+    <!-- TABS -->
+    <div style="display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:22px;gap:4px;">
+      <button id="tabLoginBtn" onclick="switchAuthTab('login')"
+        style="flex:1;padding:9px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--accent);color:#fff;font-family:inherit;">
+        Sign In
+      </button>
+      <button id="tabRegBtn" onclick="switchAuthTab('register')"
+        style="flex:1;padding:9px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--subtext);font-family:inherit;">
+        Register
+      </button>
+    </div>
+
+    <!-- SIGN IN -->
+    <div id="loginPanel">
+      <div class="form-group">
+        <label>Account Type</label>
+        <select id="loginRole" class="form-control">
+          <option value="">â€” Select your role â€”</option>
+          <option value="admin">ðŸ›¡ï¸ Administrator</option>
+          <option value="employee">ðŸ‘· Employee</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUser" class="form-control" placeholder="Enter your username" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" class="form-control" placeholder="Enter your password" />
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--subtext);margin-bottom:14px;cursor:pointer;"><input type="checkbox" id="rememberMe" style="accent-color:var(--accent);"> Remember me</label>
+      <button class="login-btn" onclick="doLogin()">Access Terminal &rarr;</button>
+      <div class="login-err" id="loginErr">Invalid credentials. Please try again.</div>
+      <div style="margin-top:14px;font-size:12px;color:var(--subtext);text-align:center;">
+        No account? <span onclick="switchAuthTab('register')" style="color:var(--accent);cursor:pointer;font-weight:600;">Register here</span>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerPanel" style="display:none;">
+      <div id="firstAdminHint" style="display:none;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:12px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--subtext);line-height:1.5;">
+        No accounts exist yet. The first account will automatically be <strong>Administrator</strong>.
+      </div>
+      <div id="adminPendingNotice" style="display:none;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--yellow);line-height:1.5;">
+        <i class="fa fa-clock"></i> Requesting <strong>Management</strong> access â€” an existing admin must approve your account before you can log in.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+        <div id="roleCardEmployee" onclick="selectRegRole('employee')"
+          style="border:2px solid var(--border);border-radius:14px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;">
+          <div style="font-size:22px;margin-bottom:6px;">ðŸ‘·</div>
+          <div style="font-size:13px;font-weight:700;">Employee</div>
+          <div style="font-size:11px;color:var(--subtext);margin-top:3px;">Operational access</div>
+        </div>
+        <div id="roleCardAdmin" onclick="selectRegRole('admin')"
+          style="border:2px solid var(--border);border-radius:14px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;">
+          <div style="font-size:22px;margin-bottom:6px;">ðŸ›¡ï¸</div>
+          <div style="font-size:13px;font-weight:700;">Management</div>
+          <div style="font-size:11px;color:var(--subtext);margin-top:3px;">Full access (requires approval)</div>
+        </div>
+      </div>
+      <div id="regRoleBadge" style="display:none;text-align:center;margin-bottom:14px;">
+        <span id="regRoleLabel" style="font-size:12px;font-weight:600;padding:4px 14px;border-radius:20px;background:rgba(249,115,22,.1);color:var(--accent);">Role selected</span>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="regName" class="form-control" placeholder="Full name" />
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="regUser" class="form-control" placeholder="Choose a username (min 3 chars)" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="regPass" class="form-control" placeholder="Minimum 8 characters" />
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="regPass2" class="form-control" placeholder="Repeat password" />
+      </div>
+      <button class="login-btn" id="regSubmitBtn" onclick="doRegister()"
+        style="background:var(--border);color:var(--subtext);cursor:not-allowed;">
+        Create Account
+      </button>
+      <div class="login-err" id="regErr" style="display:none;margin-top:10px;"></div>
+      <div id="regSuccess" style="display:none;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#22c55e;margin-top:10px;text-align:center;"></div>
+      <div style="margin-top:14px;font-size:12px;color:var(--subtext);text-align:center;">
+        Already registered? <span onclick="switchAuthTab('login')" style="color:var(--accent);cursor:pointer;font-weight:600;">Sign in</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â• SIDEBAR OVERLAY â•â•â• -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+
+<!-- â•â•â• DASHBOARD â•â•â• -->
+<div class="dashboard" id="dashboard">
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-brand">
+        <img class="sidebar-logo-img" src="assets/iss-logo.jpg" alt="ISS Global Forwarding logo">
+        <div>
+          <div class="sidebar-co-name">ISS Global Forwarding</div>
+          <div class="sidebar-co-sub">Operations</div>
+        </div>
+      </div>
+      <button class="close-sidebar-btn" onclick="toggleMobileSidebar()"><i class="fa fa-xmark"></i></button>
+    </div>
+
+    <div class="sidebar-section">Core</div>
+    <ul>
+      <li class="active-menu" onclick="showPage('pgDashboard',this)"><i class="fa fa-chart-line"></i> Dashboard</li>
+      <li onclick="showPage('pgControlTower',this)"><i class="fa fa-tower-observation"></i> Control Tower</li>
+      <li onclick="showPage('pgAICopilot',this)"><i class="fa fa-wand-magic-sparkles"></i> AI Copilot</li>
+      <li onclick="showPage('pgFleetKPI',this)"><i class="fa fa-gauge-high"></i> Fleet KPI Index</li>
+      <li onclick="showPage('pgShipments',this)"><i class="fa fa-truck"></i> Shipments</li>
+      <li onclick="showPage('pgFleet',this)"><i class="fa fa-trailer"></i> Fleet</li>
+      <li onclick="showPage('pgCrew',this)"><i class="fa fa-users"></i> Crew</li>
+      <li onclick="showPage('pgAnalytics',this)"><i class="fa fa-chart-pie"></i> Analytics</li>
+      <li onclick="showPage('pgChat',this)"><i class="fa fa-comments"></i> Team Chat</li>
+
+      <div class="sidebar-section hidden-admin">Admin Tools</div>
+      <li class="hidden-admin" onclick="showPage('pgAddOrder',this)"><i class="fa fa-plus-circle"></i> Add Order</li>
+      <li class="hidden-admin" onclick="showPage('pgAddFleet',this)"><i class="fa fa-truck-ramp-box"></i> Add Fleet</li>
+      <li class="hidden-admin" onclick="showPage('pgEmployees',this)"><i class="fa fa-user-gear"></i> Employees</li>
+      <li class="hidden-admin" onclick="showPage('pgPending',this)"><i class="fa fa-user-clock"></i> Pending Approvals <span id="pendingBadge" style="display:none;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:9px;margin-left:4px;">!</span></li>
+
+      <div class="sidebar-section">System</div>
+      <li onclick="showPage('pgSettings',this)"><i class="fa fa-gear"></i> Settings</li>
+      <li onclick="doLogout()"><i class="fa fa-right-from-bracket"></i> Logout</li>
+    </ul>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle-btn" onclick="toggleMobileSidebar()"><i class="fa fa-bars"></i></button>
+        <div>
+          <div class="topbar-title" id="topbarTitle">Operations Control Center</div>
+          <div class="live-clock" id="clock"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <input type="text" class="search-box" placeholder="Search shipment, vehicle, crew..." oninput="globalSearch(this.value)" />
+
+        <!-- Profile chip -->
+        <div class="notif-wrap" id="profileWrap">
+          <div id="topbarUserChip" onclick="toggleProfile(event)" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--subtext);padding:6px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;user-select:none;">
+            <i class="fa fa-circle-user" style="color:var(--accent)"></i>
+            <span id="topbarUserName">â€”</span>
+            <i class="fa fa-chevron-down" style="font-size:10px;"></i>
+          </div>
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-header">
+              <div class="profile-avatar"><i class="fa fa-user"></i></div>
+              <div class="profile-name" id="profileDisplayName">â€”</div>
+              <div class="profile-role" id="profileDisplayRole">â€”</div>
+            </div>
+            <div class="profile-actions">
+              <div class="profile-action-item" onclick="openEditProfile()"><i class="fa fa-pen"></i> Edit Profile</div>
+              <div class="profile-action-item" onclick="openChangePassword()"><i class="fa fa-key"></i> Change Password</div>
+              <div class="profile-action-item danger" onclick="confirmDeleteAccount()"><i class="fa fa-trash"></i> Delete Account</div>
+              <div class="profile-action-item" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i> Logout</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="icon-btn" id="themeBtn" title="Toggle theme" onclick="toggleTheme()">ðŸŒ™</button>
+
+        <!-- Notification bell -->
+        <div class="notif-wrap" id="notifWrap">
+          <button class="icon-btn" title="Notifications" onclick="toggleNotif(event)">
+            <i class="fa fa-bell"></i><span class="notif-dot" id="notifDot"></span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-head">
+              <span>Notifications</span>
+              <button class="notif-clear" onclick="clearNotifications(event)">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notifList">
+              <!-- populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <button class="icon-btn" title="Team Chat" onclick="showPage('pgChat',null)">
+          <i class="fa fa-comments"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  DASHBOARD                    â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgDashboard" class="page active">
+  <div class="enterprise-dashboard">
+    <section class="welcome-hero">
+      <div class="welcome-grid">
+        <div>
+          <div class="eyebrow">Enterprise Logistics Command Center</div>
+          <h1 class="welcome-title">Welcome back, <span id="welcomeName">Operator</span></h1>
+          <p class="welcome-copy" id="opStatusText">Live operations are ready. Register your first shipment, fleet unit, and driver to activate analytics.</p>
+        </div>
+        <div class="ops-status-grid">
+          <div class="ops-pill"><span>Current Time</span><strong id="heroClock">--:--</strong></div>
+          <div class="ops-pill"><span>Today</span><strong id="heroDate">--</strong></div>
+          <div class="ops-pill"><span>Network Status</span><strong id="networkStatus">Nominal</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-top"><div><div class="kpi-label">Total Shipments</div><div class="kpi-value" id="kpiShipments">0</div></div><div class="kpi-icon"><i class="fa fa-boxes-stacked"></i></div></div><div class="kpi-trend trend-up"><i class="fa fa-arrow-trend-up"></i><span id="kpiShipTrend">Awaiting data</span></div></div>
+      <div class="kpi-card"><div class="kpi-top"><div><div class="kpi-label">Delivered Today</div><div class="kpi-value" id="sc-delivered">0</div></div><div class="kpi-icon"><i class="fa fa-circle-check"></i></div></div><div class="kpi-trend trend-up"><i class="fa fa-check"></i><span>Completed movements</span></div></div>
+      <div class="kpi-card"><div class="kpi-top"><div><div class="kpi-label">Pending Deliveries</div><div class="kpi-value" id="pendingDeliveries">0</div></div><div class="kpi-icon"><i class="fa fa-hourglass-half"></i></div></div><div class="kpi-trend trend-warn"><i class="fa fa-clock"></i><span id="pendingDeliveryTrend">Loading / in transit</span></div></div>
+      <div class="kpi-card"><div class="kpi-top"><div><div class="kpi-label">Delayed Deliveries</div><div class="kpi-value" id="kpiDelays">0</div></div><div class="kpi-icon"><i class="fa fa-triangle-exclamation"></i></div></div><div class="kpi-trend trend-down"><i class="fa fa-bell"></i><span id="delayTrend">No alerts</span></div></div>
+      <div class="kpi-card"><div class="kpi-top"><div><div class="kpi-label">Revenue This Month</div><div class="kpi-value" id="kpiRevenue">0</div></div><div class="kpi-icon"><i class="fa fa-indian-rupee-sign"></i></div></div><div class="kpi-trend trend-up"><i class="fa fa-chart-line"></i><span id="revenueTrend">Derived from shipments</span></div></div>
+      <div class="kpi-card"><div class="kpi-top"><div><div class="kpi-label">On-Time Rate</div><div class="kpi-value" id="kpiOnTime">0%</div></div><div class="kpi-icon"><i class="fa fa-gauge-high"></i></div></div><div class="kpi-trend trend-up"><i class="fa fa-route"></i><span id="routeEfficiency">Route efficiency pending</span></div></div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="analytics-grid">
+        <div class="box">
+          <div class="box-head"><div class="box-title">Shipment Trend</div><span class="status s-blue" id="sc-transit">0</span></div>
+          <div class="metric-chart" id="shipmentTrendChart"></div>
+        </div>
+        <div class="box">
+          <div class="box-head"><div class="box-title">Revenue Trend</div><span class="status s-green" id="monthlyRevenueMini">Live</span></div>
+          <div class="chart-line" id="revenueTrendChart"></div>
+        </div>
+        <div class="box">
+          <div class="box-head"><div class="box-title">Delivery Performance</div><span class="status s-yellow" id="sc-loading">0</span></div>
+          <div id="deliveryPerformanceChart"></div>
+        </div>
+        <div class="box">
+          <div class="box-head"><div class="box-title">Driver Performance Ranking</div></div>
+          <div class="rank-list" id="driverRanking"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="box ai-insight-card">
+          <div class="box-head"><div class="box-title"><i class="fa fa-wand-magic-sparkles"></i> AI Insights</div></div>
+          <div class="ai-suggestion-list" id="aiSuggestionList">
+            <div class="ai-suggestion"><strong>Fresh terminal</strong>Add shipments, fleet, and employees to unlock live recommendations.</div>
+          </div>
+        </div>
+        <div class="box">
+          <div class="box-head"><div class="box-title">Notifications</div></div>
+          <div class="notif-list-lite" id="dashboardNotifications"></div>
+        </div>
+        <div class="box">
+          <div class="box-head"><div class="box-title">Quick Actions</div></div>
+          <div class="quick-actions">
+            <button class="btn quick-action hidden-admin" onclick="showPage('pgAddOrder',null)"><i class="fa fa-plus"></i> New Shipment</button>
+            <button class="btn quick-action hidden-admin" onclick="showPage('pgEmployees',null)"><i class="fa fa-user-plus"></i> Add Driver</button>
+            <button class="btn quick-action" onclick="showPage('pgAnalytics',null)"><i class="fa fa-file-lines"></i> Generate Report</button>
+            <button class="btn quick-action" onclick="createInvoiceDraft()"><i class="fa fa-file-invoice"></i> Create Invoice</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="box">
+        <div class="box-head">
+          <div class="box-title">Recent Shipments</div>
+          <button class="btn btn-sm btn-primary" onclick="showPage('pgShipments',null)">View All</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>ID</th><th>Route</th><th>ETA</th><th>Status</th></tr></thead>
+            <tbody id="recentShipmentsBody">
+              <tr><td colspan="4" style="text-align:center;color:var(--subtext);padding:30px;">No shipments yet. Add your first order.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-head"><div class="box-title">Recent Activity Timeline</div></div>
+        <div class="timeline-list" id="activityTimeline"></div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="box">
+        <div class="box-head"><div class="box-title">Expense Management Analytics</div><span class="status s-orange" id="expenseSummary">Monthly summary</span></div>
+        <div class="expense-list" id="expenseAnalytics"></div>
+      </div>
+      <div class="box">
+        <div class="box-head"><div class="box-title">Fleet Utilisation</div></div>
+        <div id="fleetUtilSection">No fleet data yet. Register vehicles to see utilisation.</div>
+      </div>
+    </section>
+
+    <section class="box">
+      <div class="box-head"><div class="box-title"><i class="fa fa-bolt"></i> Live Alerts</div></div>
+      <div class="feed" id="liveFeedBox">
+        <div style="color:var(--subtext);font-size:13px;text-align:center;padding:20px 0;">No alerts. System nominal.</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  SHIPMENTS<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  SHIPMENTS                    â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgControlTower" class="page">
+  <div class="enterprise-dashboard">
+    <section class="welcome-hero">
+      <div class="welcome-grid">
+        <div>
+          <div class="eyebrow">Control Tower</div>
+          <h1 class="welcome-title">Operations command view</h1>
+          <p class="welcome-copy">Monitor shipments, exceptions, capacity, approvals, and cost pressure from one connected page.</p>
+        </div>
+        <div class="ops-status-grid">
+          <div class="ops-pill"><span>Shipments</span><strong id="ctShipments">0</strong></div>
+          <div class="ops-pill"><span>Open Exceptions</span><strong id="ctExceptions">0</strong></div>
+          <div class="ops-pill"><span>Fleet Ready</span><strong id="ctFleetReady">0</strong></div>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="box">
+        <div class="box-head"><div class="box-title">Exception Queue</div><button class="btn btn-sm" onclick="showPage('pgShipments',null)">Open Shipments</button></div>
+        <div class="timeline-list" id="ctExceptionsList"></div>
+      </div>
+      <div class="box">
+        <div class="box-head"><div class="box-title">Capacity Snapshot</div><button class="btn btn-sm" onclick="showPage('pgFleetKPI',null)">Fleet KPI</button></div>
+        <div class="expense-list" id="ctCapacityList"></div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="box">
+        <div class="box-head"><div class="box-title">Live Movement Board</div></div>
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>ID</th><th>Route</th><th>Vehicle</th><th>Driver</th><th>Status</th></tr></thead>
+            <tbody id="ctMovementBody"><tr><td colspan="5" style="text-align:center;color:var(--subtext);padding:30px;">No live movements yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="box ai-insight-card">
+        <div class="box-head"><div class="box-title"><i class="fa fa-wand-magic-sparkles"></i> Copilot Watchlist</div></div>
+        <div class="ai-suggestion-list" id="ctAiWatchlist"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="pgAICopilot" class="page">
+  <div class="dashboard-grid">
+    <div class="box ai-insight-card">
+      <div class="box-head"><div class="box-title"><i class="fa fa-wand-magic-sparkles"></i> AI Copilot</div></div>
+      <div class="ai-chat-box" style="min-height:520px;display:flex;flex-direction:column;">
+        <div class="ai-chat-messages" id="aiCopilotMessages" style="height:auto;flex:1;">
+          <div class="ai-msg bot">Ask about summary, delayed shipments, pending approvals, drivers, fleet, revenue, expenses, or route efficiency.</div>
+        </div>
+        <div class="ai-chat-input">
+          <input id="aiCopilotInput" placeholder="Ask the operations copilot..." onkeydown="if(event.key==='Enter')runSmartAssistant('aiCopilotInput','aiCopilotMessages');" />
+          <button onclick="runSmartAssistant('aiCopilotInput','aiCopilotMessages')" title="Ask copilot"><i class="fa fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="box">
+        <div class="box-head"><div class="box-title">Suggested Prompts</div></div>
+        <div class="quick-actions">
+          <button class="btn quick-action" onclick="askCopilot('Give me a summary')">Summary</button>
+          <button class="btn quick-action" onclick="askCopilot('Show delayed shipments')">Delays</button>
+          <button class="btn quick-action" onclick="askCopilot('Fleet status')">Fleet</button>
+          <button class="btn quick-action" onclick="askCopilot('Revenue and expenses')">Finance</button>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-head"><div class="box-title">Current Recommendations</div></div>
+        <div class="ai-suggestion-list" id="aiCopilotSuggestions"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pgFleetKPI" class="page">
+  <div class="cards">
+    <div class="card c-blue"><h3>Total Fleet</h3><p id="fleetIndexTotal">0</p><small>Registered vehicles</small></div>
+    <div class="card c-green"><h3>Ready Index</h3><p id="fleetIndexReady">0%</p><small>Standby / in transit</small></div>
+    <div class="card c-yellow"><h3>Fuel Risk</h3><p id="fleetIndexFuelRisk">0</p><small>Under 35% fuel</small></div>
+    <div class="card c-red"><h3>Service Risk</h3><p id="fleetIndexServiceRisk">0</p><small>Maintenance / breakdown</small></div>
+  </div>
+  <div class="dashboard-grid">
+    <div class="box">
+      <div class="box-head"><div class="box-title">Fleet KPI Index</div><button class="btn btn-sm hidden-admin" onclick="showPage('pgAddFleet',null)"><i class="fa fa-plus"></i> Add Vehicle</button></div>
+      <div class="expense-list" id="fleetKpiList"></div>
+    </div>
+    <div class="box">
+      <div class="box-head"><div class="box-title">Fuel Utilisation</div></div>
+      <div id="fleetKpiFuelBars">No fleet data yet.</div>
+    </div>
+  </div>
+</div>
+
+<div id="pgShipments" class="page">
+  <div class="cards">
+    <div class="card c-green"><h3>In Transit</h3><p id="sc-transit">0</p><small>Active movements</small></div>
+    <div class="card c-blue"><h3>Loading</h3><p id="sc-loading">0</p><small>At port / warehouse</small></div>
+    <div class="card c-red"><h3>Delayed</h3><p id="sc-delayed">0</p><small>Need attention</small></div>
+    <div class="card c-orange"><h3>Delivered</h3><p id="sc-delivered">0</p><small>This month</small></div>
+  </div>
+  <div class="box">
+    <div class="box-head">
+      <div class="box-title">All Shipments</div>
+      <button class="btn btn-primary btn-sm hidden-admin" onclick="showPage('pgAddOrder',null)"><i class="fa fa-plus"></i> New Order</button>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead><tr><th>Shipment ID</th><th>Origin</th><th>Destination</th><th>Load Type</th><th>Weight</th><th>Vehicle</th><th>Driver</th><th>ETA</th><th>Status</th><th class="hidden-admin">Actions</th></tr></thead>
+        <tbody id="shipmentsBody">
+          <tr><td colspan="10" style="text-align:center;color:var(--subtext);padding:30px;">No shipments yet. Use "New Order" to add one.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  GPS TRACKING                 â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  FLEET                        â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgFleet" class="page">
+  <div class="cards">
+    <div class="card c-blue"><h3>Total Fleet</h3><p id="fkpi-total">0</p><small>Registered vehicles</small></div>
+    <div class="card c-green"><h3>Operational</h3><p id="fkpi-op">0</p><small>Available to assign</small></div>
+    <div class="card c-yellow"><h3>Maintenance</h3><p id="fkpi-maint">0</p><small>In service bay</small></div>
+    <div class="card c-red"><h3>Breakdown</h3><p id="fkpi-break">0</p><small>Field incidents</small></div>
+  </div>
+  <div class="box">
+    <div class="edit-hint"><i class="fa fa-pen-to-square"></i> Click any cell to edit inline. Changes save automatically.</div>
+    <div class="box-head"><div class="box-title">Fleet Inventory</div>
+      <button class="btn btn-sm btn-primary hidden-admin" onclick="showPage('pgAddFleet',null)"><i class="fa fa-plus"></i> Add Vehicle</button>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead><tr><th>Vehicle No.</th><th>Type</th><th>Capacity</th><th>Driver</th><th>Fuel</th><th>Last Service</th><th>Status</th><th class="hidden-admin">Actions</th></tr></thead>
+        <tbody id="fleetBody">
+          <tr><td colspan="8" style="text-align:center;color:var(--subtext);padding:30px;">No vehicles registered yet. Use "Add Vehicle" to get started.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  CREW                         â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgCrew" class="page">
+  <div class="cards">
+    <div class="card c-green"><h3>Total Crew</h3><p id="ckpi-total">0</p><small>Active employees</small></div>
+    <div class="card c-orange"><h3>On Route</h3><p id="ckpi-route">0</p><small>Drivers on road</small></div>
+    <div class="card c-blue"><h3>At Base</h3><p id="ckpi-base">0</p><small>Available</small></div>
+    <div class="card c-yellow"><h3>On Leave</h3><p id="ckpi-leave">0</p><small>Scheduled absence</small></div>
+  </div>
+  <div class="box">
+    <div class="box-head"><div class="box-title">Crew Roster</div>
+      <button class="btn btn-sm btn-primary hidden-admin" onclick="showPage('pgEmployees',null)"><i class="fa fa-user-plus"></i> Manage</button>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead><tr><th>Name</th><th>Role</th><th>Base</th><th>Vehicle</th><th>Contact</th><th>Status</th></tr></thead>
+        <tbody id="crewBody">
+          <tr><td colspan="6" style="text-align:center;color:var(--subtext);padding:30px;">No crew members added yet. Use Employees section to add staff.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  ANALYTICS                    â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgAnalytics" class="page">
+  <div class="cards">
+    <div class="card c-green"><h3>Efficiency Rate</h3><p>â€”</p><small>Add shipment data to track</small></div>
+    <div class="card c-blue"><h3>Monthly Savings</h3><p>â€”</p><small>Add fleet data to track</small></div>
+    <div class="card c-orange"><h3>Delivery Success</h3><p>â€”</p><small>Add orders to track</small></div>
+    <div class="card c-yellow"><h3>Dispatch Lag</h3><p>â€”</p><small>Tracking will populate here</small></div>
+  </div>
+  <div class="g2b">
+    <div class="box">
+      <div class="box-head"><div class="box-title">Route Performance</div></div>
+      <div style="color:var(--subtext);font-size:13px;padding:20px 0;text-align:center;">
+        <i class="fa fa-chart-bar" style="font-size:28px;opacity:.3;display:block;margin-bottom:10px;"></i>
+        Route analytics will appear here once shipments are logged.
+      </div>
+    </div>
+    <div class="box">
+      <div class="box-head"><div class="box-title">Dispatch Lag Analysis</div></div>
+      <div style="color:var(--subtext);font-size:13px;padding:20px 0;text-align:center;">
+        <i class="fa fa-stopwatch" style="font-size:28px;opacity:.3;display:block;margin-bottom:10px;"></i>
+        Dispatch data will populate once operations begin.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  ADD ORDER (Admin)            â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgAddOrder" class="page">
+  <div class="box">
+    <div class="box-head"><div class="box-title"><i class="fa fa-plus-circle" style="color:var(--accent)"></i> Create New Shipment Order</div></div>
+    <div class="field-row">
+      <div class="field"><label>Shipment ID</label><input id="oId" placeholder="Auto: SHP-XXX" readonly style="opacity:.55;" /></div>
+      <div class="field"><label>Load Type</label>
+        <select id="oLoad"><option>Electronics</option><option>FMCG</option><option>Auto Parts</option><option>Pharma</option><option>Textiles</option><option>Chemicals</option><option>Cold Chain</option></select>
+      </div>
+      <div class="field"><label>Weight (T)</label><input id="oWeight" placeholder="e.g. 12.5" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Origin</label><input id="oOrigin" placeholder="Origin" /></div>
+      <div class="field"><label>Destination</label><input id="oDest" placeholder="Destination" /></div>
+      <div class="field"><label>ETA Date</label><input type="date" id="oETA" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Assign Vehicle</label><input id="oVehicle" placeholder="Vehicle number" /></div>
+      <div class="field"><label>Assign Driver</label><input id="oDriver" placeholder="Driver name" /></div>
+      <div class="field"><label>Priority</label>
+        <select id="oPriority"><option>Normal</option><option>High</option><option>Urgent</option></select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field" style="flex:3"><label>Special Instructions</label><textarea id="oNotes" rows="2" placeholder="Any special handling, route notes..."></textarea></div>
+    </div>
+    <button class="btn btn-primary" onclick="submitOrder()"><i class="fa fa-check"></i> Create Order</button>
+    <span class="success-msg" id="orderMsg">âœ“ Order created!</span>
+  </div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  ADD FLEET (Admin)            â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgAddFleet" class="page">
+  <div class="box">
+    <div class="box-head"><div class="box-title"><i class="fa fa-truck-ramp-box" style="color:var(--accent)"></i> Register New Vehicle</div></div>
+    <div class="field-row">
+      <div class="field"><label>Vehicle Number</label><input id="fNum" placeholder="Vehicle number" /></div>
+      <div class="field"><label>Vehicle Type</label>
+        <select id="fType"><option>HCV â€“ 40FT Trailer</option><option>HCV â€“ 20FT Trailer</option><option>MCV â€“ 7.5T Truck</option><option>LCV â€“ Van</option><option>Reefer â€“ Cold Chain</option><option>Escort Vehicle</option></select>
+      </div>
+      <div class="field"><label>Capacity (T)</label><input id="fCap" placeholder="Capacity" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Assign Driver</label><input id="fDriver" placeholder="Driver name (optional)" /></div>
+      <div class="field"><label>Base Location</label><input id="fBase" placeholder="Base or depot" /></div>
+      <div class="field"><label>Fuel Level (%)</label><input id="fFuel" type="number" min="0" max="100" placeholder="Fuel level" /></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Last Service Date</label><input type="date" id="fService" /></div>
+      <div class="field"><label>Insurance Expiry</label><input type="date" id="fInsurance" /></div>
+      <div class="field"><label>Compliance Notes</label><input id="fNotes" placeholder="Permit, insurance, or route notes" /></div>
+    </div>
+    <button class="btn btn-primary" onclick="submitFleet()"><i class="fa fa-check"></i> Register Vehicle</button>
+    <span class="success-msg" id="fleetMsg">âœ“ Vehicle registered!</span>
+  </div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  EMPLOYEES (Admin)            â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgEmployees" class="page">
+  <div class="cards">
+    <div class="card c-orange"><h3>Total Staff</h3><p id="ekpi-total">0</p></div>
+    <div class="card c-green"><h3>Drivers</h3><p id="ekpi-drivers">0</p></div>
+    <div class="card c-blue"><h3>Supervisors</h3><p id="ekpi-sup">0</p></div>
+    <div class="card c-yellow"><h3>Coordinators</h3><p id="ekpi-coord">0</p></div>
+  </div>
+  <div class="box" style="margin-bottom:18px;">
+    <div class="box-head"><div class="box-title">Add Employee</div></div>
+    <div class="field-row">
+      <div class="field"><label>Full Name</label><input id="eName" placeholder="Employee name" /></div>
+      <div class="field"><label>Role</label>
+        <select id="eRole"><option>Driver</option><option>Supervisor</option><option>Coordinator</option><option>Field Engineer</option></select>
+      </div>
+      <div class="field"><label>Base Location</label><input id="eBase" placeholder="Base or department" /></div>
+      <div class="field"><label>Contact</label><input id="eContact" placeholder="10-digit mobile" /></div>
+    </div>
+    <button class="btn btn-primary" onclick="addEmployee()"><i class="fa fa-user-plus"></i> Add Employee</button>
+    <span class="success-msg" id="empMsg">âœ“ Employee added!</span>
+  </div>
+  <div class="box">
+    <div class="edit-hint"><i class="fa fa-pen-to-square"></i> Click any cell to edit inline. Changes save automatically.</div>
+    <div class="box-head"><div class="box-title">All Employees</div></div>
+    <div class="table-responsive">
+      <table>
+        <thead><tr><th>Emp ID</th><th>Name</th><th>Role</th><th>Base</th><th>Contact</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="empBody">
+          <tr><td colspan="7" style="text-align:center;color:var(--subtext);padding:30px;">No employees added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  SETTINGS                     â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  PENDING APPROVALS (Admin)    â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgPending" class="page">
+  <div style="margin-bottom:18px;">
+    <div style="font-size:20px;font-weight:700;">Pending Role Approvals</div>
+    <div style="font-size:13px;color:var(--subtext);margin-top:4px;">Review and approve Admin access requests from registered users</div>
+  </div>
+  <div class="box">
+    <div class="box-head"><div class="box-title">Pending Admin Requests</div>
+      <button class="btn btn-sm" onclick="loadPendingUsers()"><i class="fa fa-rotate"></i> Refresh</button>
+    </div>
+    <div id="pendingList" style="font-size:13px;color:var(--subtext);">Loading...</div>
+  </div>
+</div>
+
+<div id="pgSettings" class="page">
+  <div class="settings-grid">
+    <div class="setting-card">
+      <h3><i class="fa fa-bell" style="color:var(--accent)"></i> Notifications</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">Push Alerts</div><div class="setting-sub">Live feed &amp; critical events</div></div>
+        <label class="toggle"><input type="checkbox" checked onchange="saveSetting('notif_push',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Email Reports</div><div class="setting-sub">Daily operations summary</div></div>
+        <label class="toggle"><input type="checkbox" onchange="saveSetting('notif_email',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Delay Alerts</div><div class="setting-sub">Notify on shipment delays</div></div>
+        <label class="toggle"><input type="checkbox" checked onchange="saveSetting('notif_delay',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Breakdown Alerts</div><div class="setting-sub">Vehicle breakdown notifications</div></div>
+        <label class="toggle"><input type="checkbox" checked onchange="saveSetting('notif_breakdown',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <h3><i class="fa fa-palette" style="color:var(--green)"></i> Appearance</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">Dark Mode</div><div class="setting-sub" id="themeStatusText">Current: dark theme active</div></div>
+        <label class="toggle"><input type="checkbox" id="darkToggle" checked onchange="toggleTheme()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Accent Colour</div></div>
+        <div style="display:flex;gap:8px;">
+          <div class="color-swatch active" style="background:#f97316;" title="Orange" onclick="setAccent('#f97316','#ea6500',this)"></div>
+          <div class="color-swatch" style="background:#3b82f6;" title="Blue" onclick="setAccent('#3b82f6','#2563eb',this)"></div>
+          <div class="color-swatch" style="background:#22c55e;" title="Green" onclick="setAccent('#22c55e','#16a34a',this)"></div>
+          <div class="color-swatch" style="background:#a855f7;" title="Purple" onclick="setAccent('#a855f7','#9333ea',this)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <h3><i class="fa fa-shield" style="color:var(--yellow)"></i> Security &amp; Access</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">Persistent Login</div></div>
+        <select class="form-control" style="width:auto;padding:6px 10px;font-size:13px;">
+          <option>Enabled</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Two-Factor Auth</div><div class="setting-sub">Extra login security</div></div>
+        <label class="toggle"><input type="checkbox" onchange="saveSetting('2fa',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Audit Log</div><div class="setting-sub">Track all admin actions</div></div>
+        <label class="toggle"><input type="checkbox" checked onchange="saveSetting('audit',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Self Registration</div><div class="setting-sub">Allow employees to request access</div></div>
+        <label class="toggle"><input type="checkbox" id="selfRegToggle" checked onchange="saveAuthPolicy()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Password Policy</div><div class="setting-sub">Minimum 8 characters for new accounts</div></div>
+        <span style="font-size:12px;color:var(--subtext);">Configured</span>
+      </div>
+      <div class="setting-row" style="margin-top:8px;">
+        <button class="btn btn-danger btn-sm" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i> Logout &amp; Clear Session</button>
+      </div>
+    </div>
+
+    <div class="setting-card hidden-admin">
+      <h3><i class="fa fa-users" style="color:var(--accent)"></i> Registered Users
+        <span id="regUserCount" style="font-size:11px;color:var(--subtext);font-weight:400;margin-left:4px;"></span>
+      </h3>
+      <div id="regUsersTable"><div style="font-size:12px;color:var(--subtext);">Open Settings to load users.</div></div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-sm" onclick="loadRegUsers()"><i class="fa fa-rotate"></i> Refresh List</button>
+        <button class="btn btn-sm btn-danger" onclick="wipeAllUsers()"><i class="fa fa-trash"></i> Wipe All &amp; Reset</button>
+      </div>
+    </div>
+  </div>
+  <div id="settingsSaved" style="margin-top:12px;font-size:13px;color:var(--green);display:none;">âœ“ Settings saved.</div>
+</div>
+
+<!-- â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+     â•‘  TEAM CHAT (3 channels)       â•‘
+     â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="pgChat" class="page">
+  <div style="margin-bottom:16px;">
+    <div style="font-size:20px;font-weight:700;">Team Chat</div>
+    <div style="font-size:13px;color:var(--subtext);margin-top:4px;">Internal communications</div>
+  </div>
+  <div class="chat-page-wrap">
+    <div class="chat-channels">
+      <div class="channel-head">Channels</div>
+      <div class="channel-item ch-ops ch-active" onclick="switchChannel('ops',this)">
+        <div class="ch-icon"><i class="fa fa-headset"></i></div>
+        <div><div style="font-size:13px;font-weight:600;color:inherit;">Ops Team</div><div style="font-size:11px;color:var(--subtext);">Dispatch &amp; Ops</div></div>
+      </div>
+      <div class="channel-item ch-driver" onclick="switchChannel('driver',this)">
+        <div class="ch-icon"><i class="fa fa-truck"></i></div>
+        <div><div style="font-size:13px;font-weight:600;color:inherit;">Driver Comms</div><div style="font-size:11px;color:var(--subtext);">Field updates</div></div>
+      </div>
+      <div class="channel-item ch-admin" onclick="switchChannel('adminchat',this)">
+        <div class="ch-icon"><i class="fa fa-shield-halved"></i></div>
+        <div><div style="font-size:13px;font-weight:600;color:inherit;">Admin Channel</div><div style="font-size:11px;color:var(--subtext);">Management</div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;overflow:hidden;min-height:0;">
+      <!-- OPS -->
+      <div id="ch-ops" class="chat-main" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="chat-main-head">
+          <div class="chat-main-icon" style="background:rgba(249,115,22,.15);color:var(--accent);"><i class="fa fa-headset"></i></div>
+          <div><div class="chat-main-name">Ops Team</div><div class="chat-main-sub">Operations &amp; dispatch coordination</div></div>
+          <div class="chat-online">Live</div>
+        </div>
+        <div class="chat-body" id="ops-body">
+          <div class="cmsg sys"><div class="cmsg-bubble">â€” Ops Channel â€” Start your conversation â€”</div></div>
+        </div>
+        <div class="chat-footer">
+          <input type="text" id="ops-input" placeholder="Message Ops Team..." />
+          <button onclick="sendChatMsg('ops')"><i class="fa fa-paper-plane"></i></button>
+        </div>
+      </div>
+      <!-- DRIVER -->
+      <div id="ch-driver" class="chat-main" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="chat-main-head">
+          <div class="chat-main-icon" style="background:rgba(34,197,94,.15);color:var(--green);"><i class="fa fa-truck"></i></div>
+          <div><div class="chat-main-name">Driver Comms</div><div class="chat-main-sub">Field updates, check-ins &amp; alerts</div></div>
+          <div class="chat-online" style="color:var(--green);">Live</div>
+        </div>
+        <div class="chat-body" id="driver-body">
+          <div class="cmsg sys"><div class="cmsg-bubble">â€” Driver Comms â€” Start your conversation â€”</div></div>
+        </div>
+        <div class="chat-footer">
+          <input type="text" id="driver-input" placeholder="Message drivers..." />
+          <button onclick="sendChatMsg('driver')"><i class="fa fa-paper-plane"></i></button>
+        </div>
+      </div>
+      <!-- ADMIN -->
+      <div id="ch-adminchat" class="chat-main" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="chat-main-head">
+          <div class="chat-main-icon" style="background:rgba(59,130,246,.15);color:var(--blue);"><i class="fa fa-shield-halved"></i></div>
+          <div><div class="chat-main-name">Admin Channel</div><div class="chat-main-sub">Management &amp; confidential</div></div>
+          <div class="chat-online" style="color:var(--blue);">Live</div>
+        </div>
+        <div class="chat-body" id="adminchat-body">
+          <div class="cmsg sys"><div class="cmsg-bubble">â€” Admin Channel â€” Start your conversation â€”</div></div>
+        </div>
+        <div class="chat-footer">
+          <input type="text" id="adminchat-input" placeholder="Admin channel message..." />
+          <button onclick="sendChatMsg('adminchat')"><i class="fa fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    </div><!-- end .content -->
+    <button class="floating-ai-btn" id="floatingAiBtn" onclick="toggleAIAssistant()" title="ISS AI Assistant"><i class="fa fa-sparkles"></i></button>
+    <div class="floating-ai-panel" id="floatingAiPanel">
+      <div class="floating-ai-head">
+        <div class="floating-ai-avatar"><i class="fa fa-wand-magic-sparkles"></i></div>
+        <div>
+          <div class="floating-ai-title">ISS Smart Assistant</div>
+          <div class="floating-ai-sub">Operational insights from live dashboard data</div>
+        </div>
+        <button class="floating-ai-close" onclick="toggleAIAssistant(false)"><i class="fa fa-xmark"></i></button>
+      </div>
+      <div class="ai-chat-box">
+        <div class="ai-chat-messages" id="aiMessages">
+          <div class="ai-msg bot">Ask about summary, delayed shipments, pending approvals, drivers, fleet, revenue, expenses, or route efficiency.</div>
+        </div>
+        <div class="ai-chat-input">
+          <input id="aiInput" placeholder="Ask operations intelligence..." onkeydown="if(event.key==='Enter')runSmartAssistant();" />
+          <button onclick="runSmartAssistant()" title="Ask assistant"><i class="fa fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div><!-- end .main -->
+</div><!-- end .dashboard -->
+
+<!-- â•â•â• MODALS â•â•â• -->
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('editProfileModal')"><i class="fa fa-xmark"></i></button>
+    <h2><i class="fa fa-pen" style="color:var(--accent)"></i> Edit / Update Profile</h2>
+    <div class="field-row" style="flex-direction:column;gap:14px;">
+      <div class="field"><label>Full Name</label><input id="editName" placeholder="Your full name" /></div>
+      <div class="field"><label>Username</label><input id="editUsername" placeholder="Your username" readonly style="opacity:.55;" /></div>
+      <div class="field"><label>Base / Department</label><input id="editBase" placeholder="Base or department" /></div>
+      <div class="field"><label>Contact Number</label><input id="editContact" placeholder="Contact number" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="clearProfileDetails()"><i class="fa fa-eraser"></i> Remove Details</button>
+      <button class="btn" onclick="closeModal('editProfileModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProfile()"><i class="fa fa-check"></i> Save Changes</button>
+    </div>
+    <div id="editProfileMsg" style="margin-top:10px;font-size:13px;color:var(--green);display:none;">âœ“ Profile updated!</div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="changePassModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('changePassModal')"><i class="fa fa-xmark"></i></button>
+    <h2><i class="fa fa-key" style="color:var(--accent)"></i> Change Password</h2>
+    <div class="field-row" style="flex-direction:column;gap:14px;">
+      <div class="field"><label>Current Password</label><input type="password" id="cpCurrent" placeholder="Enter current password" /></div>
+      <div class="field"><label>New Password</label><input type="password" id="cpNew" placeholder="New password (min 8 chars)" /></div>
+      <div class="field"><label>Confirm New Password</label><input type="password" id="cpConfirm" placeholder="Repeat new password" /></div>
+    </div>
+    <div class="login-err" id="cpErr" style="display:none;"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('changePassModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePassword()"><i class="fa fa-key"></i> Update Password</button>
+    </div>
+    <div id="cpSuccessMsg" style="margin-top:10px;font-size:13px;color:var(--green);display:none;">âœ“ Password changed!</div>
+  </div>
+</div>
+
+<!-- Delete Account Confirm Modal -->
+<div class="modal-overlay" id="deleteAccountModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('deleteAccountModal')"><i class="fa fa-xmark"></i></button>
+    <h2 style="color:var(--red);"><i class="fa fa-triangle-exclamation"></i> Delete Account</h2>
+    <p style="font-size:13px;color:var(--subtext);line-height:1.6;margin-bottom:18px;">
+      This will permanently delete your account and all associated data. This action <strong>cannot be undone</strong>.
+    </p>
+    <div class="field"><label>Type your username to confirm</label><input id="deleteConfirmInput" placeholder="Enter your username" /></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('deleteAccountModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="doDeleteAccount()"><i class="fa fa-trash"></i> Delete My Account</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  ISS GLOBAL FORWARDING â€” OPERATIONS TERMINAL  v3.0
+//  Auth: open registration, role selection, admin approvals
+//  Data: shared storage provider for multi-user operational data
+//  UI: fully inline-editable tables, toast feedback
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+// â”€â”€ STORAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+var USERS_KEY      = 'iss_gf_users';
+var PENDING_KEY    = 'iss_gf_pending';
+var SESSION_KEY    = 'iss_gf_session';
+var AUTH_CFG_KEY   = 'iss_gf_auth_cfg';
+var SHIPMENTS_KEY  = 'iss_gf_shipments';
+var FLEET_KEY      = 'iss_gf_fleet';
+var EMPLOYEES_KEY  = 'iss_gf_employees';
+var NOTIF_KEY      = 'iss_gf_notifs';
+var SETTINGS_KEY   = 'iss_gf_settings';
+var ORDER_CNT_KEY  = 'iss_gf_order_cnt';
+var EMP_CNT_KEY    = 'iss_gf_emp_cnt';
+var RESET_VERSION_KEY = 'iss_gf_reset_version';
+var RESET_VERSION = '2026-06-03-enterprise-fresh-start-v2';
+
+var storeCache = {};
+var volatileSession = null;
+var storeReady = false;
+var ISS_DB_NAME = 'iss_global_forwarding_shared';
+var ISS_DB_STORE = 'records';
+
+function openSharedDB(){
+  return new Promise(function(resolve,reject){
+    if(!window.indexedDB){reject(new Error('IndexedDB unavailable'));return;}
+    var req=indexedDB.open(ISS_DB_NAME,1);
+    req.onupgradeneeded=function(){req.result.createObjectStore(ISS_DB_STORE,{keyPath:'key'});};
+    req.onsuccess=function(){resolve(req.result);};
+    req.onerror=function(){reject(req.error);};
+  });
+}
+function idbGetAll(){
+  return openSharedDB().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction(ISS_DB_STORE,'readonly');
+      var req=tx.objectStore(ISS_DB_STORE).getAll();
+      req.onsuccess=function(){resolve(req.result||[]);};
+      req.onerror=function(){reject(req.error);};
+    });
+  });
+}
+function idbPut(k,v){
+  return openSharedDB().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction(ISS_DB_STORE,'readwrite');
+      tx.objectStore(ISS_DB_STORE).put({key:k,value:v,updatedAt:new Date().toISOString()});
+      tx.oncomplete=function(){resolve();};
+      tx.onerror=function(){reject(tx.error);};
+    });
+  }).catch(function(){});
+}
+function idbRemove(k){
+  return openSharedDB().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction(ISS_DB_STORE,'readwrite');
+      tx.objectStore(ISS_DB_STORE).delete(k);
+      tx.oncomplete=function(){resolve();};
+      tx.onerror=function(){reject(tx.error);};
+    });
+  }).catch(function(){});
+}
+function apiUrl(k){return String(window.ISS_STORAGE_API||'').replace(/\/$/,'')+'/records/'+encodeURIComponent(k);}
+function apiEnabled(){return !!window.ISS_STORAGE_API;}
+function apiGetAll(){
+  if(!apiEnabled())return Promise.resolve(null);
+  return fetch(String(window.ISS_STORAGE_API).replace(/\/$/,'')+'/records').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
+}
+function apiPut(k,v){
+  if(!apiEnabled())return;
+  fetch(apiUrl(k),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:v})}).catch(function(){});
+}
+function apiRemove(k){
+  if(!apiEnabled())return;
+  fetch(apiUrl(k),{method:'DELETE'}).catch(function(){});
+}
+function hydrateSharedStore(){
+  return idbGetAll().then(function(rows){
+    rows.forEach(function(r){storeCache[r.key]=r.value;});
+    return apiGetAll();
+  }).then(function(apiRows){
+    if(Array.isArray(apiRows)){
+      apiRows.forEach(function(r){storeCache[r.key]=r.value;idbPut(r.key,r.value);});
+    }
+    storeReady=true;
+  }).catch(function(){
+    storeReady=true;
+  });
+}
+function lsGet(k){return Object.prototype.hasOwnProperty.call(storeCache,k)?storeCache[k]:null;}
+function lsSet(k,v){storeCache[k]=v;idbPut(k,v);apiPut(k,v);}
+function lsRemove(k){delete storeCache[k];idbRemove(k);apiRemove(k);}
+
+function getUsers(){return lsGet(USERS_KEY)||[];}
+function saveUsers(u){lsSet(USERS_KEY,u);}
+function getPending(){return lsGet(PENDING_KEY)||[];}
+function savePending(p){lsSet(PENDING_KEY,p);}
+function getAuthCfg(){return lsGet(AUTH_CFG_KEY)||{};}
+function saveAuthCfg(c){lsSet(AUTH_CFG_KEY,c);}
+
+function resetTerminalDataOnce(){
+  if(lsGet(RESET_VERSION_KEY)===RESET_VERSION)return;
+  lsSet(RESET_VERSION_KEY,RESET_VERSION);
+}
+
+// â”€â”€ SESSION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+var currentUser = null;
+var orderCount  = lsGet(ORDER_CNT_KEY)||1;
+var empCount    = lsGet(EMP_CNT_KEY)||1;
+var notifications = lsGet(NOTIF_KEY)||[];
+
+function getSession(){return lsGet(SESSION_KEY)||null;}
+function saveSession(u,remember){
+  if(remember){lsSet(SESSION_KEY,u);}
+  else{volatileSession=u;lsRemove(SESSION_KEY);}
+}
+function clearSession(){lsRemove(SESSION_KEY);volatileSession=null;}
+
+// â”€â”€ TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function showToast(msg,type){
+  type=type||'info';
+  var icons={ok:'fa-check-circle',err:'fa-circle-xmark',info:'fa-circle-info',warn:'fa-triangle-exclamation'};
+  var colors={ok:'var(--green)',err:'var(--red)',info:'var(--blue)',warn:'var(--yellow)'};
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;background:var(--sidebar);border:1px solid var(--border);border-radius:11px;padding:11px 15px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,.4);max-width:320px;animation:fadeIn .2s ease;border-left:3px solid '+colors[type]+';';
+  t.innerHTML='<i class="fa '+icons[type]+'" style="color:'+colors[type]+';font-size:15px;"></i><span>'+escapeHtml(msg)+'</span>';
+  document.body.appendChild(t);
+  setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},3200);
+}
+
+// â”€â”€ CLOCK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function updateClock(){
+  var now=new Date();
+  var d=now.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  var tm=now.toLocaleTimeString('en-GB');
+  var el=document.getElementById('clock'); if(el) el.textContent=d+' Â· '+tm;
+  var hc=document.getElementById('heroClock'); if(hc) hc.textContent=tm;
+  var hd=document.getElementById('heroDate'); if(hd) hd.textContent=d;
+}
+setInterval(updateClock,1000); updateClock();
+
+// â”€â”€ ESCAPE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function escapeHtml(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,function(c){
+    return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+// â”€â”€ AUTH TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function switchAuthTab(t){
+  document.getElementById('loginPanel').style.display=t==='login'?'':'none';
+  document.getElementById('registerPanel').style.display=t==='register'?'':'none';
+  var lb=document.getElementById('tabLoginBtn'),rb=document.getElementById('tabRegBtn');
+  lb.style.background=t==='login'?'var(--accent)':'transparent';lb.style.color=t==='login'?'#fff':'var(--subtext)';
+  rb.style.background=t==='register'?'var(--accent)':'transparent';rb.style.color=t==='register'?'#fff':'var(--subtext)';
+  if(t==='register') prepareRegistration();
+}
+
+// â”€â”€ REGISTRATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+var selectedRegRole = null;
+
+function prepareRegistration(){
+  var hasUsers = getUsers().length > 0;
+  var hint = document.getElementById('firstAdminHint');
+  if(hint) hint.style.display = hasUsers ? 'none' : 'block';
+  // Default selection: employee if users exist, admin if first user
+  if(!selectedRegRole) selectRegRole(hasUsers ? 'employee' : 'admin');
+}
+
+function selectRegRole(r){
+  selectedRegRole = r;
+  var hasUsers = getUsers().length > 0;
+  var notice = document.getElementById('adminPendingNotice');
+  // Show pending notice only when choosing admin and users already exist
+  if(notice) notice.style.display = (r==='admin' && hasUsers) ? 'block' : 'none';
+  ['admin','employee'].forEach(function(x){
+    var el=document.getElementById('roleCard'+x.charAt(0).toUpperCase()+x.slice(1));
+    if(el){el.style.borderColor=x===r?'var(--accent)':'var(--border)';el.style.background=x===r?'rgba(249,115,22,.08)':'transparent';}
+  });
+  var badge=document.getElementById('regRoleBadge'),label=document.getElementById('regRoleLabel');
+  if(badge){badge.style.display='block';}
+  if(label){
+    var pendingNote = (r==='admin' && hasUsers) ? ' (Pending Approval)' : '';
+    label.textContent=r.charAt(0).toUpperCase()+r.slice(1)+pendingNote;
+  }
+  var btn=document.getElementById('regSubmitBtn');
+  if(btn){btn.style.background='var(--accent)';btn.style.color='#fff';btn.style.cursor='pointer';}
+  var err=document.getElementById('regErr'); if(err)err.style.display='none';
+}
+
+function doRegister(){
+  var name=document.getElementById('regName').value.trim();
+  var user=document.getElementById('regUser').value.trim();
+  var pass=document.getElementById('regPass').value;
+  var pass2=document.getElementById('regPass2').value;
+  var role=selectedRegRole;
+  var errEl=document.getElementById('regErr');
+  var show=function(m){errEl.textContent=m;errEl.style.display='block';};
+  errEl.style.display='none';
+  if(!role){show('Please select a role.');return;}
+  if(!name){show('Please enter your full name.');return;}
+  if(user.length<3){show('Username must be at least 3 characters.');return;}
+  if(!/^[a-zA-Z0-9._-]+$/.test(user)){show('Username: letters, numbers, dots, hyphens only.');return;}
+  if(pass.length<8){show('Password must be at least 8 characters.');return;}
+  if(pass!==pass2){show('Passwords do not match.');return;}
+  var users=getUsers();
+  if(users.find(function(u){return u.username===user;})){show('Username already taken.');return;}
+  // Check pending too
+  var pending=getPending();
+  if(pending.find(function(p){return p.username===user;})){show('Username already taken (pending approval).');return;}
+  // First user becomes admin automatically
+  if(users.length===0){
+    users.push({username:user,password:pass,name:name,role:'admin',base:'',contact:''});
+    saveUsers(users);
+    var s=document.getElementById('regSuccess');
+    s.textContent='âœ“ Admin account created! You can now sign in.';s.style.display='block';
+    setTimeout(function(){switchAuthTab('login');document.getElementById('loginUser').value=user;s.style.display='none';},2000);
+    return;
+  }
+  // Admin requested by non-first user â†’ goes to pending queue
+  if(role==='admin'){
+    pending.push({username:user,password:pass,name:name,requestedRole:'admin',base:'',contact:'',requestedAt:new Date().toLocaleDateString()});
+    savePending(pending);
+    updatePendingBadge();
+    var s=document.getElementById('regSuccess');
+    s.textContent='âœ“ Admin request submitted! An administrator will review your access shortly.';s.style.display='block';
+    setTimeout(function(){switchAuthTab('login');s.style.display='none';},2800);
+    return;
+  }
+  // Employee: direct access
+  users.push({username:user,password:pass,name:name,role:'employee',base:'',contact:''});
+  saveUsers(users);
+  var s=document.getElementById('regSuccess');
+  s.textContent='âœ“ Account created! You can now sign in.';s.style.display='block';
+  setTimeout(function(){switchAuthTab('login');document.getElementById('loginUser').value=user;s.style.display='none';},2000);
+}
+
+// â”€â”€ LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function doLogin(){
+  var user=document.getElementById('loginUser').value.trim();
+  var pass=document.getElementById('loginPass').value;
+  var roleEl=document.getElementById('loginRole');
+  var chosenRole=roleEl?roleEl.value:'';
+  var remember=document.getElementById('rememberMe')&&document.getElementById('rememberMe').checked;
+  var errEl=document.getElementById('loginErr');
+  if(!chosenRole){errEl.textContent='Please select your account type first.';errEl.style.display='block';return;}
+  if(!user){errEl.textContent='Please enter your username.';errEl.style.display='block';return;}
+  if(!pass){errEl.textContent='Please enter your password.';errEl.style.display='block';return;}
+  // Check if pending
+  var pending=getPending();
+  var pend=pending.find(function(p){return p.username===user&&p.password===pass;});
+  if(pend){errEl.textContent='Your Admin request is pending approval. An administrator must approve your account before you can log in.';errEl.style.display='block';return;}
+  var users=getUsers();
+  var found=users.find(function(u){return u.username===user&&u.password===pass&&u.role===chosenRole;});
+  if(!found){errEl.textContent='Invalid username or password.';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  currentUser=found;
+  saveSession(found,remember);
+  launchDashboard(found);
+}
+
+function launchDashboard(user){
+  document.getElementById('loginPage').style.display='none';
+  var db=document.getElementById('dashboard'); db.style.display='flex';
+  document.getElementById('topbarUserName').textContent=user.name||user.username;
+  var welcome=document.getElementById('welcomeName'); if(welcome)welcome.textContent=user.name||user.username;
+  document.getElementById('profileDisplayName').textContent=user.name||user.username;
+  document.getElementById('profileDisplayRole').textContent=user.role.charAt(0).toUpperCase()+user.role.slice(1);
+  document.querySelectorAll('.hidden-admin').forEach(function(el){el.style.display=user.role==='admin'?'':'none';});
+  setOrderId();
+  renderNotifications();
+  restoreOperationalData();
+  updateAISuggestions();
+  renderEnterpriseDashboard();
+  var fab=document.getElementById('floatingAiBtn'); if(fab)fab.style.display='flex';
+  updatePendingBadge();
+  if(user.role==='admin'){loadRegUsers();loadPendingUsers();}
+  loadAuthPolicy();
+}
+
+function doLogout(){
+  clearSession(); currentUser=null;
+  document.getElementById('dashboard').style.display='none';
+  var fab=document.getElementById('floatingAiBtn'); if(fab)fab.style.display='none';
+  var panel=document.getElementById('floatingAiPanel'); if(panel)panel.classList.remove('open');
+  document.querySelectorAll('.hidden-admin').forEach(function(el){el.style.display='none';});
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').style.display='none';
+}
+
+// Auto-restore
+function bootstrapApp(){
+  hydrateSharedStore().then(function(){
+    resetTerminalDataOnce();
+    notifications = lsGet(NOTIF_KEY)||[];
+    orderCount = lsGet(ORDER_CNT_KEY)||1;
+    empCount = lsGet(EMP_CNT_KEY)||1;
+    prepareRegistration();
+    loadAuthPolicy();
+    applySavedTheme();
+    var s=lsGet(SESSION_KEY)||volatileSession;
+    if(s){currentUser=s;launchDashboard(s);}
+  });
+}
+bootstrapApp();
+
+// â”€â”€ PENDING APPROVALS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function updatePendingBadge(){
+  var cnt=getPending().length;
+  var b=document.getElementById('pendingBadge');
+  if(b) b.style.display=cnt>0?'inline':'none';
+  renderEnterpriseDashboard();
+}
+function loadPendingUsers(){
+  var pending=getPending();
+  var el=document.getElementById('pendingList');
+  if(!el)return;
+  if(pending.length===0){el.innerHTML='<div style="color:var(--subtext);padding:16px 0;">No pending Admin requests at this time.</div>';return;}
+  el.innerHTML=pending.map(function(p,i){
+    return '<div class="pend-row"><div class="pend-info">'
+      +'<div class="pend-name">'+escapeHtml(p.name||p.username)+'</div>'
+      +'<div class="pend-meta">Username: '+escapeHtml(p.username)+' Â· Requested: '+escapeHtml(p.requestedAt||'â€”')+'</div>'
+      +'</div><div class="pend-actions">'
+      +'<button class="btn btn-sm" style="border-color:var(--green);color:var(--green);" onclick="approvePending('+i+')"><i class="fa fa-check"></i> Approve Admin</button>'
+      +'<button class="btn btn-sm" onclick="approveAsEmployee('+i+')">Approve as Employee</button>'
+      +'<button class="btn btn-sm btn-danger" onclick="rejectPending('+i+')">Reject</button>'
+      +'</div></div>';
+  }).join('');
+}
+function approvePending(i){
+  var pending=getPending();
+  var p=pending[i]; if(!p)return;
+  var users=getUsers();
+  users.push({username:p.username,password:p.password,name:p.name||p.username,role:'admin',base:p.base||'',contact:p.contact||''});
+  saveUsers(users);
+  pending.splice(i,1); savePending(pending);
+  updatePendingBadge(); loadPendingUsers(); loadRegUsers();
+  showToast(p.name+' approved as Admin.','ok');
+}
+function approveAsEmployee(i){
+  var pending=getPending();
+  var p=pending[i]; if(!p)return;
+  var users=getUsers();
+  users.push({username:p.username,password:p.password,name:p.name||p.username,role:'employee',base:p.base||'',contact:p.contact||''});
+  saveUsers(users);
+  pending.splice(i,1); savePending(pending);
+  updatePendingBadge(); loadPendingUsers(); loadRegUsers();
+  showToast(p.name+' approved as Employee.','ok');
+}
+function rejectPending(i){
+  if(!confirm('Reject this request? The user will not be able to log in with this account.'))return;
+  var pending=getPending();
+  var p=pending[i]; if(!p)return;
+  pending.splice(i,1); savePending(pending);
+  updatePendingBadge(); loadPendingUsers();
+  showToast('Request rejected.','info');
+}
+
+// â”€â”€ SIDEBAR / NAVIGATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function showPage(id,li){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var pg=document.getElementById(id); if(pg){pg.classList.add('active');}
+  document.querySelectorAll('.sidebar ul li').forEach(function(el){el.classList.remove('active-menu');});
+  if(li){li.classList.add('active-menu');}
+  document.getElementById('topbarTitle').textContent=id.replace('pg','').replace(/([A-Z])/g,' $1').trim();
+  closePanels();
+  if(id==='pgSettings'){loadRegUsers();loadPendingUsers();}
+  if(id==='pgPending'){loadPendingUsers();}
+  if(window.innerWidth<=768){
+    var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay');
+    if(s)s.classList.remove('open'); if(o)o.style.display='none';
+  }
+}
+function showDisabledGPS(){
+  closePanels();
+  if(window.innerWidth<=768){
+    var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay');
+    if(s)s.classList.remove('open'); if(o)o.style.display='none';
+  }
+  showToast('GPS tracking disabled until backend/API is connected.','warn');
+  addNotification('fa-location-dot','rgba(245,158,11,.15)','var(--yellow)','GPS tracking is disabled until backend/API access is available.');
+}
+function toggleMobileSidebar(){
+  var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay');
+  s.classList.toggle('open'); o.style.display=s.classList.contains('open')?'block':'none';
+}
+
+// â”€â”€ NOTIFICATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderNotifications(){
+  var list=document.getElementById('notifList'); if(!list)return;
+  var unread=notifications.filter(function(n){return n.unread;}).length;
+  var dot=document.getElementById('notifDot'); if(dot){dot.style.display=unread>0?'block':'none';}
+  list.innerHTML=notifications.map(function(n){
+    return '<div class="notif-item" onclick="markRead('+n.id+',event)">'
+      +'<div class="notif-icon" style="background:'+escapeHtml(n.iconBg)+';color:'+escapeHtml(n.iconColor)+';"><i class="fa '+escapeHtml(n.icon)+'"></i></div>'
+      +'<div style="flex:1;"><div class="notif-text">'+escapeHtml(n.text)+'</div><div class="notif-time">'+escapeHtml(n.time)+'</div></div>'
+      +(n.unread?'<div class="notif-unread"></div>':'')
+      +'</div>';
+  }).join('')||'<div style="padding:20px;text-align:center;font-size:13px;color:var(--subtext);">All caught up!</div>';
+}
+function markRead(id,e){if(e)e.stopPropagation();notifications.forEach(function(n){if(n.id===id)n.unread=false;});lsSet(NOTIF_KEY,notifications);renderNotifications();}
+function clearNotifications(e){if(e)e.stopPropagation();notifications.forEach(function(n){n.unread=false;});lsSet(NOTIF_KEY,notifications);renderNotifications();}
+function addNotification(icon,iconBg,iconColor,text){
+  var now=new Date();
+  var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  notifications.unshift({id:Date.now(),icon:icon,iconBg:iconBg,iconColor:iconColor,text:text,time:t,unread:true});
+  if(notifications.length>40)notifications=notifications.slice(0,40);
+  lsSet(NOTIF_KEY,notifications);
+  renderNotifications();
+}
+function toggleNotif(e){
+  if(e)e.stopPropagation();
+  var d=document.getElementById('notifDropdown'),pd=document.getElementById('profileDropdown');
+  if(pd){pd.classList.remove('open');} if(d){d.classList.toggle('open');renderNotifications();}
+}
+function toggleProfile(e){
+  if(e)e.stopPropagation();
+  var d=document.getElementById('profileDropdown'),nd=document.getElementById('notifDropdown');
+  if(nd){nd.classList.remove('open');} if(d)d.classList.toggle('open');
+}
+function closePanels(){
+  var d=document.getElementById('notifDropdown'),p=document.getElementById('profileDropdown');
+  if(d)d.classList.remove('open'); if(p)p.classList.remove('open');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#notifWrap')) { var nd=document.getElementById('notifDropdown'); if(nd)nd.classList.remove('open'); }
+  if(!e.target.closest('#profileWrap')) { var pd=document.getElementById('profileDropdown'); if(pd)pd.classList.remove('open'); }
+});
+
+// â”€â”€ MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function openModal(id){var m=document.getElementById(id);if(m)m.style.display='flex';}
+function closeModal(id){var m=document.getElementById(id);if(m)m.style.display='none';}
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('modal-overlay'))e.target.style.display='none';
+});
+
+// â”€â”€ PROFILE ACTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function openEditProfile(){
+  if(!currentUser)return;
+  document.getElementById('editName').value=currentUser.name||'';
+  document.getElementById('editUsername').value=currentUser.username||'';
+  document.getElementById('editBase').value=currentUser.base||'';
+  document.getElementById('editContact').value=currentUser.contact||'';
+  openModal('editProfileModal'); closePanels();
+}
+function saveProfile(){
+  if(!currentUser)return;
+  var name=document.getElementById('editName').value.trim();
+  var base=document.getElementById('editBase').value.trim();
+  var contact=document.getElementById('editContact').value.trim();
+  if(!name){showToast('Name cannot be empty.','err');return;}
+  var users=getUsers();
+  var idx=users.findIndex(function(u){return u.username===currentUser.username;});
+  if(idx>=0){users[idx].name=name;users[idx].base=base;users[idx].contact=contact;saveUsers(users);}
+  currentUser.name=name;currentUser.base=base;currentUser.contact=contact;
+  saveSession(currentUser,!!lsGet(SESSION_KEY));
+  document.getElementById('topbarUserName').textContent=name;
+  document.getElementById('profileDisplayName').textContent=name;
+  var m=document.getElementById('editProfileMsg'); if(m){m.style.display='block';setTimeout(function(){m.style.display='none';closeModal('editProfileModal');},1500);}
+  showToast('Profile updated!','ok');
+}
+function clearProfileDetails(){
+  if(!currentUser)return;
+  document.getElementById('editBase').value=''; document.getElementById('editContact').value='';
+  currentUser.base=''; currentUser.contact='';
+  var users=getUsers(); var idx=users.findIndex(function(u){return u.username===currentUser.username;});
+  if(idx>=0){users[idx].base='';users[idx].contact='';saveUsers(users);}
+  saveSession(currentUser,!!lsGet(SESSION_KEY));
+  showToast('Details cleared.','info');
+}
+function openChangePassword(){closeModal('editProfileModal');openModal('changePassModal');closePanels();}
+function savePassword(){
+  if(!currentUser)return;
+  var cur=document.getElementById('cpCurrent').value;
+  var nw=document.getElementById('cpNew').value;
+  var conf=document.getElementById('cpConfirm').value;
+  var err=document.getElementById('cpErr');
+  if(cur!==currentUser.password){err.textContent='Current password is incorrect.';err.style.display='block';return;}
+  if(nw.length<8){err.textContent='New password must be at least 8 characters.';err.style.display='block';return;}
+  if(nw!==conf){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  err.style.display='none';
+  var users=getUsers(); var idx=users.findIndex(function(u){return u.username===currentUser.username;});
+  if(idx>=0){users[idx].password=nw;saveUsers(users);}
+  currentUser.password=nw; saveSession(currentUser,!!lsGet(SESSION_KEY));
+  var m=document.getElementById('cpSuccessMsg'); if(m){m.style.display='block';setTimeout(function(){m.style.display='none';closeModal('changePassModal');},1500);}
+  showToast('Password changed!','ok');
+}
+function confirmDeleteAccount(){openModal('deleteAccountModal');closePanels();}
+function doDeleteAccount(){
+  var input=document.getElementById('deleteConfirmInput').value.trim();
+  if(!currentUser||input!==currentUser.username){showToast('Username does not match.','err');return;}
+  var users=getUsers();
+  var admins=users.filter(function(u){return u.role==='admin';});
+  if(currentUser.role==='admin'&&admins.length<=1){showToast('At least one admin is required.','err');return;}
+  saveUsers(users.filter(function(u){return u.username!==currentUser.username;}));
+  closeModal('deleteAccountModal'); doLogout();
+  showToast('Account deleted.','info');
+}
+
+// â”€â”€ THEME / SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function toggleTheme(){
+  document.body.classList.toggle('light-mode');
+  var t=document.getElementById('themeBtn'); if(t)t.textContent=document.body.classList.contains('light-mode')?'â˜€ï¸':'ðŸŒ™';
+  var tog=document.getElementById('darkToggle'); if(tog)tog.checked=!document.body.classList.contains('light-mode');
+}
+function setTheme(mode){
+  var isLight=mode==='light';
+  document.body.classList.toggle('light-mode',isLight);
+  var t=document.getElementById('themeBtn'); if(t)t.innerHTML=isLight?'<i class="fa fa-sun"></i>':'<i class="fa fa-moon"></i>';
+  var tog=document.getElementById('darkToggle'); if(tog)tog.checked=!isLight;
+  var sub=document.getElementById('themeStatusText'); if(sub)sub.textContent='Current: '+(isLight?'light':'dark')+' theme active';
+  lsSet('iss_gf_theme',isLight?'light':'dark');
+}
+function applySavedTheme(){
+  setTheme(lsGet('iss_gf_theme')||'dark');
+}
+toggleTheme=function(){
+  var next=!document.body.classList.contains('light-mode');
+  setTheme(next?'light':'dark');
+};
+function setAccent(c1,c2,el){
+  document.documentElement.style.setProperty('--accent',c1);
+  document.documentElement.style.setProperty('--accent2',c2);
+  document.querySelectorAll('.color-swatch').forEach(function(s){s.classList.remove('active');});
+  if(el)el.classList.add('active');
+}
+function saveSetting(k,v){
+  var el=document.getElementById('settingsSaved'); if(el){el.style.display='block';setTimeout(function(){el.style.display='none';},2000);}
+  showToast('Settings saved.','ok');
+}
+function saveAuthPolicy(){
+  var cfg=getAuthCfg();
+  var t=document.getElementById('selfRegToggle');
+  cfg.selfRegistration=!!(t&&t.checked);
+  saveAuthCfg(cfg);
+  showToast('Auth policy updated.','ok');
+}
+function loadAuthPolicy(){
+  var cfg=getAuthCfg();
+  var t=document.getElementById('selfRegToggle');
+  if(t)t.checked=cfg.selfRegistration!==false;
+}
+
+// â”€â”€ ADMIN: REGISTERED USERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function loadRegUsers(){
+  loadAuthPolicy();
+  var users=getUsers();
+  var cnt=document.getElementById('regUserCount'); if(cnt)cnt.textContent='('+users.length+' users)';
+  var tb=document.getElementById('regUsersTable'); if(!tb)return;
+  if(users.length===0){tb.innerHTML='<div style="font-size:12px;color:var(--subtext);">No registered users yet.</div>';return;}
+  var wrap=document.createElement('div'); wrap.className='table-responsive';
+  var tbl=document.createElement('table');
+  tbl.innerHTML='<thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Actions</th></tr></thead>';
+  var tbody=document.createElement('tbody');
+  users.forEach(function(u){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+escapeHtml(u.username)+'</td>'
+      +'<td>'+escapeHtml(u.name||'â€”')+'</td>'
+      +'<td><select class="form-control" style="min-width:110px;padding:6px 8px;font-size:12px;">'
+      +'<option value="admin"'+(u.role==='admin'?' selected':'')+'>Management</option>'
+      +'<option value="employee"'+(u.role==='employee'?' selected':'')+'>Employee</option>'
+      +'</select></td>'
+      +'<td><button class="btn btn-sm" style="margin-right:4px;">Set Password</button>'
+      +'<button class="btn btn-sm btn-danger">Remove</button></td>';
+    tr.querySelector('select').addEventListener('change',function(){ updateUserRole(u.username,this.value); });
+    tr.querySelectorAll('button')[0].addEventListener('click',function(){ resetUserPassword(u.username); });
+    tr.querySelectorAll('button')[1].addEventListener('click',function(){ removeUser(u.username); });
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody); wrap.appendChild(tbl); tb.innerHTML=''; tb.appendChild(wrap);
+}
+function updateUserRole(un,role){
+  var users=getUsers();
+  var admins=users.filter(function(u){return u.role==='admin';});
+  var idx=users.findIndex(function(u){return u.username===un;});
+  if(idx<0)return;
+  if(users[idx].role==='admin'&&role!=='admin'&&admins.length<=1){showToast('At least one admin required.','err');loadRegUsers();return;}
+  users[idx].role=role; saveUsers(users); loadRegUsers();
+  showToast('Role updated.','ok');
+}
+function resetUserPassword(un){
+  var np=prompt('Enter new password for '+un+' (minimum 8 characters):');
+  if(np===null)return;
+  if(np.length<8){showToast('Password must be at least 8 characters.','err');return;}
+  var users=getUsers(); var idx=users.findIndex(function(u){return u.username===un;});
+  if(idx>=0){users[idx].password=np;saveUsers(users);}
+  showToast('Password updated for '+un+'.','ok');
+}
+function removeUser(un){
+  if(!confirm('Remove user "'+un+'"?'))return;
+  var users=getUsers();
+  var target=users.find(function(u){return u.username===un;});
+  if(target&&target.role==='admin'&&users.filter(function(u){return u.role==='admin';}).length<=1){
+    showToast('At least one admin is required.','err');return;
+  }
+  saveUsers(users.filter(function(u){return u.username!==un;})); loadRegUsers();
+  showToast('User removed.','info');
+}
+function wipeAllUsers(){if(!confirm('Wipe ALL registered users? You will be logged out.'))return;saveUsers([]);savePending([]);doLogout();}
+
+// â”€â”€ RESTORE OPERATIONAL DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function restoreOperationalData(){
+  var saved_shipments = lsGet(SHIPMENTS_KEY)||[];
+  var saved_fleet     = lsGet(FLEET_KEY)||[];
+  var saved_employees = lsGet(EMPLOYEES_KEY)||[];
+  orderCount = lsGet(ORDER_CNT_KEY)||1;
+  empCount   = lsGet(EMP_CNT_KEY)||1;
+
+  var sb=document.getElementById('shipmentsBody');
+  if(sb && saved_shipments.length>0){
+    sb.innerHTML='';
+    saved_shipments.forEach(function(s){appendShipmentRow(s,false);});
+    updateShipmentKPIs();
+    // Recent shipments
+    var rbs=document.getElementById('recentShipmentsBody');
+    if(rbs){
+      rbs.innerHTML='';
+      saved_shipments.slice(-5).reverse().forEach(function(s){
+        rbs.insertAdjacentHTML('beforeend','<tr><td>'+escapeHtml(s.id)+'</td><td>'+escapeHtml(s.origin)+' â†’ '+escapeHtml(s.dest)+'</td><td>'+escapeHtml(s.eta)+'</td><td>'+statusBadge(s.status||'Loading')+'</td></tr>');
+      });
+    }
+  }
+  var fb=document.getElementById('fleetBody');
+  if(fb && saved_fleet.length>0){
+    fb.innerHTML='';
+    saved_fleet.forEach(function(v){appendFleetRow(v,false);});
+    updateFleetKPIs(); buildFleetUtilSection(saved_fleet);
+  }
+  var eb=document.getElementById('empBody');
+  if(eb && saved_employees.length>0){
+    eb.innerHTML='';
+    var cb=document.getElementById('crewBody'); if(cb)cb.innerHTML='';
+    saved_employees.forEach(function(emp){appendEmpRow(emp);appendCrewRow(emp);});
+    updateEmployeeKPIs();
+  }
+}
+
+// â”€â”€ STATUS BADGE HELPER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function statusBadge(s){
+  s=s||'Loading';
+  var cls='s-blue';
+  var low=s.toLowerCase();
+  if(low.includes('transit')||low.includes('moving')||low.includes('operational'))cls='s-green';
+  else if(low.includes('delay')||low.includes('breakdown')||low.includes('overdue'))cls='s-red';
+  else if(low.includes('deliver')||low.includes('completed'))cls='s-green';
+  else if(low.includes('maint')||low.includes('standby'))cls='s-yellow';
+  return '<span class="status '+cls+'">'+escapeHtml(s)+'</span>';
+}
+function statusSelectHtml(current,type){
+  var opts;
+  if(type==='shipment') opts=['Loading','In Transit','Delayed','Delivered','On Hold','Cancelled'];
+  else if(type==='fleet') opts=['Standby','In Transit','Maintenance','Breakdown','Decommissioned'];
+  else opts=['Active','On Route','On Leave','Inactive'];
+  var cls=getStatusClass(current);
+  var sel=document.createElement('select');
+  sel.className='status-select '+cls;
+  sel.dataset.stype=type;
+  opts.forEach(function(o){
+    var opt=document.createElement('option');
+    opt.value=o; opt.textContent=o;
+    if(o===current)opt.selected=true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change',function(){onStatusChange(this,this.dataset.stype);});
+  // Return a placeholder; caller must use DOM insertion, not innerHTML
+  // We store the element in a temp map keyed by a unique id
+  var uid='ss_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  statusSelectHtml._cache=statusSelectHtml._cache||{};
+  statusSelectHtml._cache[uid]=sel;
+  return '<span data-ssid="'+uid+'"></span>';
+}
+function _resolveStatusSelects(container){
+  if(!statusSelectHtml._cache)return;
+  container.querySelectorAll('[data-ssid]').forEach(function(span){
+    var uid=span.getAttribute('data-ssid');
+    var sel=statusSelectHtml._cache[uid];
+    if(sel){span.parentNode.replaceChild(sel,span);delete statusSelectHtml._cache[uid];}
+  });
+}
+function getStatusClass(s){
+  var low=(s||'').toLowerCase();
+  if(low.includes('transit')||low.includes('moving')||low.includes('operational')||low.includes('active')||low.includes('deliver')||low.includes('complet'))return 's-green';
+  if(low.includes('delay')||low.includes('break')||low.includes('overdue')||low.includes('cancel'))return 's-red';
+  if(low.includes('maint')||low.includes('standby')||low.includes('leave'))return 's-yellow';
+  return 's-blue';
+}
+function onStatusChange(sel,type){
+  sel.className='status-select '+getStatusClass(sel.value);
+  if(type==='shipment')updateShipmentKPIs();
+  else if(type==='fleet')updateFleetKPIs();
+  saveAll();
+  showToast('Status updated.','ok');
+}
+
+// â”€â”€ SAVE ALL DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function saveAll(){
+  // Collect shipments from DOM
+  var sh=[];
+  document.querySelectorAll('#shipmentsBody tr[data-id]').forEach(function(row){
+    var cells=row.querySelectorAll('td');
+    var sel=row.querySelector('.status-select');
+    sh.push({
+      id:cells[0].textContent,origin:cells[1].textContent,dest:cells[2].textContent,
+      load:cells[3].textContent,weight:cells[4].textContent,vehicle:cells[5].textContent,
+      driver:cells[6].textContent,eta:cells[7].textContent,
+      status:sel?sel.value:(cells[8]?cells[8].textContent:'Loading')
+    });
+  });
+  lsSet(SHIPMENTS_KEY,sh);
+  // Fleet
+  var fl=[];
+  document.querySelectorAll('#fleetBody tr[data-id]').forEach(function(row){
+    var cells=row.querySelectorAll('td');
+    var sel=row.querySelector('.status-select');
+    fl.push({id:cells[0].textContent,type:cells[1].textContent,cap:cells[2].textContent,driver:cells[3].textContent,fuel:cells[4].textContent,service:cells[5].textContent,status:sel?sel.value:'Standby'});
+  });
+  lsSet(FLEET_KEY,fl);
+  // Employees
+  var em=[];
+  document.querySelectorAll('#empBody tr[data-id]').forEach(function(row){
+    var cells=row.querySelectorAll('td');
+    em.push({id:cells[0].textContent,name:cells[1].textContent,role:cells[2].textContent,base:cells[3].textContent,contact:cells[4].textContent});
+  });
+  lsSet(EMPLOYEES_KEY,em);
+  lsSet(ORDER_CNT_KEY,orderCount);
+  lsSet(EMP_CNT_KEY,empCount);
+  updateAISuggestions();
+  renderEnterpriseDashboard();
+}
+// Auto-save every 4 seconds
+setInterval(saveAll,4000);
+
+// â”€â”€ ORDER MANAGEMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function setOrderId(){var el=document.getElementById('oId');if(el)el.value='SHP-'+String(orderCount).padStart(3,'0');}
+function appendShipmentRow(s, prepend){
+  var isAdmin=currentUser&&currentUser.role==='admin';
+  var tb=document.getElementById('shipmentsBody'); if(!tb)return;
+  var id=s.id||('SHP-'+String(orderCount).padStart(3,'0'));
+  var status=s.status||'Loading';
+  var row=document.createElement('tr');row.dataset.id=id;
+  row.innerHTML='<td contenteditable="true">'+escapeHtml(id)+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(s.origin||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(s.dest||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(s.load||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(s.weight||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(s.vehicle||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(s.driver||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(s.eta||'')+'</td>'
+    +'<td>'+statusSelectHtml(status,'shipment')+'</td>'
+    +(isAdmin?'<td class="hidden-admin"><button class="btn btn-sm btn-danger" onclick="removeRow(this)">Remove</button></td>':'<td class="hidden-admin"></td>');
+  row.querySelectorAll('td[contenteditable]').forEach(function(td){
+    td.addEventListener('blur',function(){saveAll();});
+  });
+  if(prepend!==false) tb.insertBefore(row,tb.firstChild);
+  else tb.appendChild(row);
+}
+function submitOrder(){
+  var origin=document.getElementById('oOrigin').value.trim();
+  var dest=document.getElementById('oDest').value.trim();
+  if(!origin||!dest){showToast('Please enter origin and destination.','err');return;}
+  var s={
+    id:'SHP-'+String(orderCount).padStart(3,'0'),
+    load:document.getElementById('oLoad').value,
+    weight:(document.getElementById('oWeight').value||'â€”')+'T',
+    origin:origin, dest:dest,
+    eta:document.getElementById('oETA').value||'â€”',
+    vehicle:document.getElementById('oVehicle').value||'â€”',
+    driver:document.getElementById('oDriver').value||'â€”',
+    priority:document.getElementById('oPriority').value,
+    status:'Loading'
+  };
+  // Clear empty state
+  var sb=document.getElementById('shipmentsBody');
+  if(sb&&sb.querySelector('td[colspan]'))sb.innerHTML='';
+  appendShipmentRow(s,true);
+  // Recent dashboard
+  var rbs=document.getElementById('recentShipmentsBody');
+  if(rbs){if(rbs.querySelector('td[colspan]'))rbs.innerHTML='';
+    rbs.insertAdjacentHTML('afterbegin','<tr><td>'+escapeHtml(s.id)+'</td><td>'+escapeHtml(origin)+' â†’ '+escapeHtml(dest)+'</td><td>'+escapeHtml(s.eta)+'</td><td>'+statusBadge('Loading')+'</td></tr>');
+  }
+  orderCount++; lsSet(ORDER_CNT_KEY,orderCount); setOrderId();
+  document.getElementById('oWeight').value='';document.getElementById('oOrigin').value='';document.getElementById('oDest').value='';
+  updateShipmentKPIs(); saveAll();
+  addNotification('fa-box','rgba(249,115,22,.15)','var(--accent)','New shipment '+s.id+': '+origin+' â†’ '+dest);
+  var msg=document.getElementById('orderMsg'); if(msg){msg.style.display='inline';setTimeout(function(){msg.style.display='none';},3000);}
+  showToast('Shipment '+s.id+' created!','ok');
+}
+function removeRow(btn){
+  if(!confirm('Remove this entry?'))return;
+  btn.closest('tr').remove();
+  updateShipmentKPIs(); saveAll();
+  showToast('Entry removed.','info');
+}
+function updateShipmentKPIs(){
+  var rows=document.querySelectorAll('#shipmentsBody tr[data-id]');
+  var transit=0,loading=0,delayed=0,delivered=0;
+  rows.forEach(function(r){
+    var sel=r.querySelector('.status-select'); var t=sel?sel.value.toLowerCase():'loading';
+    if(t.includes('transit'))transit++;
+    else if(t.includes('loading')||t.includes('hold'))loading++;
+    else if(t.includes('delay')||t.includes('cancel'))delayed++;
+    else if(t.includes('deliver'))delivered++;
+  });
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  set('sc-transit',transit);set('sc-loading',loading);set('sc-delayed',delayed);set('sc-delivered',delivered);
+  set('kpiShipments',rows.length);set('kpiDelays',delayed);
+  set('pendingDeliveries',transit+loading);
+  renderEnterpriseDashboard();
+}
+
+// â”€â”€ FLEET MANAGEMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function appendFleetRow(v, prepend){
+  var fb=document.getElementById('fleetBody'); if(!fb)return;
+  var isAdmin=currentUser&&currentUser.role==='admin';
+  var status=v.status||'Standby';
+  var row=document.createElement('tr'); row.dataset.id=v.id||v.num||Date.now();
+  row.innerHTML='<td contenteditable="true">'+escapeHtml(v.id||v.num||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(v.type||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(v.cap||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(v.driver||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(v.fuel||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(v.service||'')+'</td>'
+    +'<td>'+statusSelectHtml(status,'fleet')+'</td>'
+    +(isAdmin?'<td class="hidden-admin"><button class="btn btn-sm btn-danger" onclick="removeRow(this)">Remove</button></td>':'<td class="hidden-admin"></td>');
+  row.querySelectorAll('td[contenteditable]').forEach(function(td){td.addEventListener('blur',function(){saveAll();updateFleetKPIs();buildFleetUtilSectionFromDOM();});});
+  if(prepend!==false) fb.insertBefore(row,fb.firstChild);
+  else fb.appendChild(row);
+}
+function submitFleet(){
+  var num=document.getElementById('fNum').value.trim();
+  if(!num){showToast('Please enter vehicle number.','err');return;}
+  var v={id:num,type:document.getElementById('fType').value,cap:(document.getElementById('fCap').value||'â€”')+'T',
+    driver:document.getElementById('fDriver').value||'â€”',fuel:(document.getElementById('fFuel').value||'â€”')+'%',
+    service:document.getElementById('fService').value||'â€”',status:'Standby'};
+  var fb=document.getElementById('fleetBody');
+  if(fb&&fb.querySelector('td[colspan]'))fb.innerHTML='';
+  appendFleetRow(v,true);
+  document.getElementById('fNum').value='';document.getElementById('fCap').value='';document.getElementById('fFuel').value='';
+  updateFleetKPIs(); buildFleetUtilSectionFromDOM(); saveAll();
+  addNotification('fa-trailer','rgba(59,130,246,.15)','var(--blue)','Vehicle '+num+' registered to fleet.');
+  var msg=document.getElementById('fleetMsg'); if(msg){msg.style.display='inline';setTimeout(function(){msg.style.display='none';},3000);}
+  showToast('Vehicle '+num+' registered!','ok');
+}
+function updateFleetKPIs(){
+  var rows=document.querySelectorAll('#fleetBody tr[data-id]');
+  var op=0,maint=0,brk=0,total=0;
+  rows.forEach(function(r){
+    total++;
+    var sel=r.querySelector('.status-select'); var t=sel?sel.value.toLowerCase():'standby';
+    if(t.includes('operational')||t.includes('standby')||t.includes('transit'))op++;
+    else if(t.includes('maint'))maint++;
+    else if(t.includes('break'))brk++;
+  });
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  set('fkpi-total',total);set('fkpi-op',op);set('fkpi-maint',maint);set('fkpi-break',brk);
+  var kf=document.getElementById('kpiFleet');if(kf)kf.textContent=total>0?Math.round(op/total*100)+'%':'0%';
+  renderEnterpriseDashboard();
+}
+function buildFleetUtilSection(fleet){
+  var fus=document.getElementById('fleetUtilSection'); if(!fus)return;
+  buildFleetUtilSectionInto(fus,fleet);
+}
+function buildFleetUtilSectionInto(fus,fleet){
+  if(!fleet||fleet.length===0){fus.textContent='No fleet data yet. Register vehicles to see utilisation.';return;}
+  var html='';
+  fleet.slice(0,6).forEach(function(v){
+    var pct=parseInt(v.fuel)||0;
+    var clr=pct>60?'var(--green)':pct>30?'var(--yellow)':'var(--red)';
+    html+='<div class="prog-wrap"><div class="prog-label"><span>'+escapeHtml(v.id||v.num||'Vehicle')+'</span><span>'+pct+'%</span></div>'
+      +'<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+clr+'"></div></div></div>';
+  });
+  fus.innerHTML=html;
+}
+function buildFleetUtilSectionFromDOM(){
+  var rows=document.querySelectorAll('#fleetBody tr[data-id]');
+  var fleet=[];
+  rows.forEach(function(r){var cells=r.querySelectorAll('td');fleet.push({id:cells[0].textContent,fuel:cells[4].textContent});});
+  buildFleetUtilSection(fleet);
+}
+
+// â”€â”€ EMPLOYEE MANAGEMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function appendEmpRow(emp){
+  var eb=document.getElementById('empBody'); if(!eb)return;
+  var row=document.createElement('tr'); row.dataset.id=emp.id;
+  row.innerHTML='<td>'+escapeHtml(emp.id)+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(emp.name||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(emp.role||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(emp.base||'')+'</td>'
+    +'<td contenteditable="true">'+escapeHtml(emp.contact||'')+'</td>'
+    +'<td>'+statusSelectHtml('Active','emp')+'</td>'
+    +'<td><button class="btn btn-sm btn-danger" onclick="removeEmpRow(this)">Remove</button></td>';
+  row.querySelectorAll('td[contenteditable]').forEach(function(td){td.addEventListener('blur',function(){saveAll();updateEmployeeKPIs();});});
+  eb.appendChild(row);
+  _resolveStatusSelects(row);
+}
+function appendCrewRow(emp){
+  var cb=document.getElementById('crewBody'); if(!cb)return;
+  var row=document.createElement('tr');
+  row.innerHTML='<td>'+escapeHtml(emp.name||'')+'</td><td>'+escapeHtml(emp.role||'')+'</td><td>'+escapeHtml(emp.base||'')+'</td><td>â€”</td><td>'+escapeHtml(emp.contact||'')+'</td><td>'+statusBadge('Active')+'</td>';
+  cb.appendChild(row);
+}
+function addEmployee(){
+  var name=document.getElementById('eName').value.trim();
+  if(!name){showToast('Please enter employee name.','err');return;}
+  var emp={id:'EMP-'+String(empCount).padStart(3,'0'),name:name,role:document.getElementById('eRole').value,base:document.getElementById('eBase').value.trim()||'â€”',contact:document.getElementById('eContact').value.trim()||'â€”'};
+  var eb=document.getElementById('empBody');
+  if(eb&&eb.querySelector('td[colspan]'))eb.innerHTML='';
+  appendEmpRow(emp);
+  var cb=document.getElementById('crewBody');
+  if(cb&&cb.querySelector('td[colspan]'))cb.innerHTML='';
+  appendCrewRow(emp);
+  empCount++; lsSet(EMP_CNT_KEY,empCount);
+  document.getElementById('eName').value=''; document.getElementById('eContact').value='';
+  updateEmployeeKPIs(); saveAll();
+  var msg=document.getElementById('empMsg'); if(msg){msg.style.display='inline';setTimeout(function(){msg.style.display='none';},3000);}
+  showToast(name+' added!','ok');
+}
+function removeEmpRow(btn){if(!confirm('Remove this employee?'))return;btn.closest('tr').remove();updateEmployeeKPIs();saveAll();showToast('Employee removed.','info');}
+function updateEmployeeKPIs(){
+  var rows=document.querySelectorAll('#empBody tr[data-id]');
+  var total=0,drivers=0,sup=0,coord=0;
+  rows.forEach(function(r){
+    total++;
+    var cells=r.querySelectorAll('td'); var rt=(cells[2]?cells[2].textContent:'').toLowerCase();
+    if(rt.includes('driver'))drivers++;
+    else if(rt.includes('super'))sup++;
+    else if(rt.includes('coord'))coord++;
+  });
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  set('ekpi-total',total);set('ekpi-drivers',drivers);set('ekpi-sup',sup);set('ekpi-coord',coord);
+  set('ckpi-total',total);set('ckpi-route',drivers);set('ckpi-base',sup+coord);set('ckpi-leave',0);
+  renderEnterpriseDashboard();
+}
+
+// â”€â”€ CHAT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+var botReplies={
+  ops:['Noted. Updating the dispatch board.','Acknowledged.','Escalated to operations.','Status updated.','Confirmed.'],
+  driver:['Acknowledged.','Contact base on arrival.','Support team notified.','Copy that.','Proceed safely.'],
+  adminchat:['Noted.','Understood.','Report received.','Action taken.','Will follow up.']
+};
+var botNames={ops:'Ops Control',driver:'Fleet Coordinator',adminchat:'Admin System'};
+function switchChannel(ch,el){
+  ['ch-ops','ch-driver','ch-adminchat'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
+  var target=document.getElementById('ch-'+ch); if(target){target.style.display='flex';scrollCh(ch);}
+  document.querySelectorAll('.channel-item').forEach(function(i){i.classList.remove('ch-active');});
+  if(el)el.classList.add('ch-active');
+}
+function scrollCh(ch){var body=document.getElementById(ch+'-body');if(body)setTimeout(function(){body.scrollTop=body.scrollHeight;},50);}
+function sendChatMsg(ch){
+  var inp=document.getElementById(ch+'-input'),body=document.getElementById(ch+'-body');
+  if(!inp||!body)return; var msg=inp.value.trim(); if(!msg)return;
+  var now=new Date(); var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  var me=document.createElement('div');me.className='cmsg me';
+  me.innerHTML='<div class="cmsg-meta"><span>'+t+'</span></div><div class="cmsg-bubble">'+escapeHtml(msg)+'</div>';
+  body.appendChild(me);inp.value='';scrollCh(ch);
+  setTimeout(function(){
+    var bot=document.createElement('div');bot.className='cmsg other';
+    var replies=botReplies[ch]||botReplies.ops;
+    bot.innerHTML='<div class="cmsg-meta"><span class="cmsg-sender">'+(botNames[ch]||'Bot')+'</span><span>'+t+'</span></div><div class="cmsg-bubble">'+replies[Math.floor(Math.random()*replies.length)]+'</div>';
+    body.appendChild(bot);scrollCh(ch);
+  },1100);
+}
+['ops-input','driver-input','adminchat-input'].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el)el.addEventListener('keydown',function(e){if(e.key==='Enter'){sendChatMsg(id.replace('-input',''));}});
+});
+
+// â”€â”€ GLOBAL SEARCH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function globalSearch(q){
+  document.querySelectorAll('table tbody tr').forEach(function(row){
+    if(row.querySelector('td[colspan]'))return;
+    row.style.display=(!q||row.textContent.toLowerCase().includes(q.toLowerCase()))?'':'none';
+  });
+}
+
+function fmtMoney(n){
+  try{return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n||0);}
+  catch(e){return 'â‚¹'+Math.round(n||0).toLocaleString('en-IN');}
+}
+
+function getOpsMetrics(){
+  var shipments=lsGet(SHIPMENTS_KEY)||[];
+  var fleet=lsGet(FLEET_KEY)||[];
+  var employees=lsGet(EMPLOYEES_KEY)||[];
+  var pending=getPending();
+  var notifications=lsGet(NOTIF_KEY)||[];
+  var byStatus=function(word){return shipments.filter(function(s){return String(s.status||'').toLowerCase().includes(word);});};
+  var delayed=shipments.filter(function(s){var st=String(s.status||'').toLowerCase();return st.includes('delay')||st.includes('cancel');});
+  var delivered=byStatus('deliver');
+  var transit=byStatus('transit');
+  var loading=shipments.filter(function(s){var st=String(s.status||'Loading').toLowerCase();return st.includes('loading')||st.includes('hold');});
+  var drivers=employees.filter(function(e){return String(e.role||'').toLowerCase().includes('driver');});
+  var revenue=shipments.length*18500+delivered.length*4200+transit.length*2600;
+  var fuel=fleet.reduce(function(sum,v){var fuel=parseInt(String(v.fuel||'0').replace(/\D/g,''))||0;return sum+Math.max(1200,(100-fuel)*95);},0);
+  var toll=Math.round(shipments.length*780);
+  var repairs=fleet.filter(function(v){var st=String(v.status||'').toLowerCase();return st.includes('maint')||st.includes('break');}).length*7200;
+  var parking=Math.round((loading.length+transit.length)*320);
+  var expenses={fuel:fuel,toll:toll,repairs:repairs,parking:parking,total:fuel+toll+repairs+parking};
+  var onTime=shipments.length?Math.max(0,Math.round((shipments.length-delayed.length)/shipments.length*100)):0;
+  var routeEff=shipments.length?Math.max(55,Math.round((delivered.length+transit.length)/(shipments.length||1)*100)):0;
+  return {shipments:shipments,fleet:fleet,employees:employees,pending:pending,notifications:notifications,delayed:delayed,delivered:delivered,transit:transit,loading:loading,drivers:drivers,revenue:revenue,expenses:expenses,onTime:onTime,routeEff:routeEff};
+}
+
+function renderBars(id,values,labels,color){
+  var el=document.getElementById(id); if(!el)return;
+  var max=Math.max.apply(null,values.concat([1]));
+  el.innerHTML=values.map(function(v,i){
+    var h=Math.max(16,Math.round(v/max*170));
+    return '<div class="chart-bar" style="height:'+h+'px;background:'+color+'"><span>'+escapeHtml(labels[i])+'</span></div>';
+  }).join('');
+}
+
+function renderLineBars(id,values){
+  var el=document.getElementById(id); if(!el)return;
+  var max=Math.max.apply(null,values.concat([1]));
+  el.innerHTML=values.map(function(v){
+    var h=Math.max(22,Math.round(v/max*172));
+    return '<div class="chart-point" style="height:'+h+'px"></div>';
+  }).join('');
+}
+
+function renderEnterpriseDashboard(){
+  var d=getOpsMetrics();
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  set('kpiShipments',d.shipments.length);
+  set('pendingDeliveries',d.transit.length+d.loading.length);
+  set('kpiDelays',d.delayed.length);
+  set('sc-delivered',d.delivered.length);
+  set('sc-transit',d.transit.length);
+  set('sc-loading',d.loading.length);
+  set('kpiRevenue',fmtMoney(d.revenue));
+  set('kpiOnTime',d.onTime+'%');
+  set('kpiShipTrend',d.shipments.length?d.shipments.length+' active records':'Awaiting first shipment');
+  set('pendingDeliveryTrend',(d.transit.length+d.loading.length)+' open movements');
+  set('delayTrend',d.delayed.length?d.delayed.length+' exceptions need review':'No active exceptions');
+  set('revenueTrend',d.revenue>0?'Revenue vs expenses: '+fmtMoney(d.revenue-d.expenses.total):'Derived from shipments');
+  set('routeEfficiency','Route efficiency '+d.routeEff+'%');
+  set('networkStatus',d.delayed.length?'Exceptions Active':'Nominal');
+  set('opStatusText',d.shipments.length?'Monitoring '+d.shipments.length+' shipments, '+d.fleet.length+' fleet units, and '+d.employees.length+' team members.':'Live operations are ready. Register your first shipment, fleet unit, and driver to activate analytics.');
+  set('expenseSummary','Total '+fmtMoney(d.expenses.total));
+  set('monthlyRevenueMini',fmtMoney(d.revenue));
+
+  var shipmentTrend=[d.loading.length,d.transit.length,d.delivered.length,d.delayed.length,Math.max(0,d.shipments.length-d.delivered.length)];
+  renderBars('shipmentTrendChart',shipmentTrend,['Load','Transit','Done','Delay','Open'],'linear-gradient(180deg,#ef4444,rgba(239,68,68,.2))');
+  renderLineBars('revenueTrendChart',[d.revenue*.35,d.revenue*.48,d.revenue*.62,d.revenue*.74,d.revenue*.88,d.revenue]);
+  renderBars('deliveryPerformanceChart',[d.onTime,Math.max(0,100-d.onTime),d.routeEff],['On-time','Risk','Route'],'linear-gradient(180deg,#22c55e,rgba(34,197,94,.18))');
+
+  var ranking=document.getElementById('driverRanking');
+  if(ranking){
+    var rows=d.drivers.length?d.drivers.slice(0,5):[{name:'No drivers registered',role:'Add drivers in Employees'}];
+    ranking.innerHTML=rows.map(function(e,i){
+      var score=d.drivers.length?Math.max(72,98-(i*6)-d.delayed.length):0;
+      return '<div class="rank-item"><div class="rank-meta"><strong>'+escapeHtml(e.name||e.id||'Driver')+'</strong><span>'+escapeHtml(e.base||e.role||'Performance data pending')+'</span></div><span class="score-badge">'+(score?score+'%':'--')+'</span></div>';
+    }).join('');
+  }
+
+  var expenses=document.getElementById('expenseAnalytics');
+  if(expenses){
+    expenses.innerHTML=[
+      ['Fuel expenses',d.expenses.fuel,'fa-gas-pump'],
+      ['Toll charges',d.expenses.toll,'fa-road'],
+      ['Repairs',d.expenses.repairs,'fa-screwdriver-wrench'],
+      ['Parking expenses',d.expenses.parking,'fa-square-parking'],
+      ['Expense approval queue',d.pending.length,'fa-clipboard-check']
+    ].map(function(x){
+      return '<div class="expense-item"><div class="expense-meta"><strong><i class="fa '+x[2]+'"></i> '+escapeHtml(x[0])+'</strong><span>Monthly operational summary</span></div><span class="score-badge">'+(typeof x[1]==='number'&&x[0].includes('queue')?x[1]:fmtMoney(x[1]))+'</span></div>';
+    }).join('');
+  }
+
+  var dn=document.getElementById('dashboardNotifications');
+  if(dn){
+    var items=[];
+    d.delayed.slice(0,2).forEach(function(s){items.push(['Delayed shipment',s.id+' '+(s.origin||'')+' to '+(s.dest||''),'s-red']);});
+    if(d.pending.length)items.push(['Admin requests',d.pending.length+' registration approvals pending','s-yellow']);
+    if(d.expenses.total)items.push(['Expense submissions','Monthly expense estimate '+fmtMoney(d.expenses.total),'s-orange']);
+    if(!items.length)items.push(['Operations clear','No urgent notifications right now','s-green']);
+    dn.innerHTML=items.map(function(n){return '<div class="notif-lite"><div><strong>'+escapeHtml(n[0])+'</strong><div class="notif-time">'+escapeHtml(n[1])+'</div></div><span class="status '+n[2]+'">Live</span></div>';}).join('');
+  }
+
+  var tl=document.getElementById('activityTimeline');
+  if(tl){
+    var acts=[];
+    d.shipments.slice(-3).reverse().forEach(function(s){acts.push(['Shipment update',(s.id||'Shipment')+' marked '+(s.status||'Loading'),'fa-box']);});
+    d.fleet.slice(-2).reverse().forEach(function(v){acts.push(['Driver assignment',(v.driver||'Unassigned')+' linked to '+(v.id||'vehicle'),'fa-truck']);});
+    if(d.revenue)acts.push(['Invoice generation','Projected monthly billing '+fmtMoney(d.revenue),'fa-file-invoice']);
+    if(!acts.length)acts.push(['System ready','Create records to populate activity','fa-circle-info']);
+    tl.innerHTML=acts.slice(0,5).map(function(a){return '<div class="timeline-item"><div class="timeline-meta"><strong><i class="fa '+a[2]+'"></i> '+escapeHtml(a[0])+'</strong><span>'+escapeHtml(a[1])+'</span></div><span class="notif-time">Now</span></div>';}).join('');
+  }
+  renderControlTower(d);
+  renderFleetKPIIndex(d);
+}
+
+function renderControlTower(d){
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  var ready=d.fleet.filter(function(v){var st=String(v.status||'Standby').toLowerCase();return st.includes('standby')||st.includes('transit')||st.includes('operational');});
+  set('ctShipments',d.shipments.length);
+  set('ctExceptions',d.delayed.length+d.pending.length);
+  set('ctFleetReady',ready.length);
+  var ex=document.getElementById('ctExceptionsList');
+  if(ex){
+    var exceptions=[];
+    d.delayed.forEach(function(s){exceptions.push(['Shipment exception',(s.id||'Shipment')+' '+(s.origin||'')+' to '+(s.dest||''),'s-red']);});
+    d.pending.forEach(function(p){exceptions.push(['Access approval',(p.name||p.username)+' requested admin access','s-yellow']);});
+    if(!exceptions.length)exceptions.push(['No active exceptions','Control tower is clear','s-green']);
+    ex.innerHTML=exceptions.slice(0,6).map(function(x){return '<div class="timeline-item"><div class="timeline-meta"><strong>'+escapeHtml(x[0])+'</strong><span>'+escapeHtml(x[1])+'</span></div><span class="status '+x[2]+'">Live</span></div>';}).join('');
+  }
+  var cap=document.getElementById('ctCapacityList');
+  if(cap){
+    cap.innerHTML=[
+      ['Ready fleet',ready.length,'fa-truck-fast'],
+      ['Drivers',d.drivers.length,'fa-id-card'],
+      ['Open shipments',d.transit.length+d.loading.length,'fa-route'],
+      ['Monthly expenses',fmtMoney(d.expenses.total),'fa-receipt']
+    ].map(function(x){return '<div class="expense-item"><div class="expense-meta"><strong><i class="fa '+x[2]+'"></i> '+escapeHtml(x[0])+'</strong><span>Connected operational data</span></div><span class="score-badge">'+escapeHtml(x[1])+'</span></div>';}).join('');
+  }
+  var mv=document.getElementById('ctMovementBody');
+  if(mv){
+    var moving=d.shipments.slice(-8).reverse();
+    mv.innerHTML=moving.length?moving.map(function(s){
+      return '<tr><td>'+escapeHtml(s.id||'')+'</td><td>'+escapeHtml((s.origin||'')+' to '+(s.dest||''))+'</td><td>'+escapeHtml(s.vehicle||'--')+'</td><td>'+escapeHtml(s.driver||'--')+'</td><td>'+statusBadge(s.status||'Loading')+'</td></tr>';
+    }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--subtext);padding:30px;">No live movements yet.</td></tr>';
+  }
+  var watch=document.getElementById('ctAiWatchlist');
+  if(watch){
+    var items=[];
+    if(d.delayed.length)items.push(['Delay focus',formatShipmentList(d.delayed)]);
+    if(ready.length<d.loading.length)items.push(['Capacity risk','Ready fleet is lower than loading/on-hold shipments.']);
+    if(!d.drivers.length)items.push(['Driver setup','Add driver employees before assigning orders.']);
+    if(!items.length)items.push(['Stable operations','No immediate control tower action is required.']);
+    watch.innerHTML=items.map(function(x){return '<div class="ai-suggestion"><strong>'+escapeHtml(x[0])+'</strong>'+escapeHtml(x[1])+'</div>';}).join('');
+  }
+}
+
+function renderFleetKPIIndex(d){
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  var ready=d.fleet.filter(function(v){var st=String(v.status||'Standby').toLowerCase();return st.includes('standby')||st.includes('transit')||st.includes('operational');});
+  var serviceRisk=d.fleet.filter(function(v){var st=String(v.status||'').toLowerCase();return st.includes('maint')||st.includes('break');});
+  var fuelRisk=d.fleet.filter(function(v){return (parseInt(String(v.fuel||'0').replace(/\D/g,''))||0)<35;});
+  set('fleetIndexTotal',d.fleet.length);
+  set('fleetIndexReady',d.fleet.length?Math.round(ready.length/d.fleet.length*100)+'%':'0%');
+  set('fleetIndexFuelRisk',fuelRisk.length);
+  set('fleetIndexServiceRisk',serviceRisk.length);
+  var list=document.getElementById('fleetKpiList');
+  if(list){
+    list.innerHTML=d.fleet.length?d.fleet.map(function(v){
+      var fuel=parseInt(String(v.fuel||'0').replace(/\D/g,''))||0;
+      var st=String(v.status||'Standby');
+      var score=Math.max(0,Math.min(100,Math.round((fuel*.55)+(st.toLowerCase().includes('break')?10:st.toLowerCase().includes('maint')?35:45))));
+      return '<div class="expense-item"><div class="expense-meta"><strong>'+escapeHtml(v.id||v.num||'Vehicle')+'</strong><span>'+escapeHtml((v.type||'Fleet unit')+' - '+st+' - Fuel '+fuel+'%')+'</span></div><span class="score-badge">'+score+'%</span></div>';
+    }).join(''):'<div style="color:var(--subtext);font-size:13px;">No fleet data yet. Register vehicles to calculate KPI scores.</div>';
+  }
+  buildFleetUtilSection(d.fleet);
+  var bars=document.getElementById('fleetKpiFuelBars');
+  if(bars)buildFleetUtilSectionInto(bars,d.fleet);
+}
+
+function toggleAIAssistant(force){
+  var panel=document.getElementById('floatingAiPanel'); if(!panel)return;
+  var open=typeof force==='boolean'?force:!panel.classList.contains('open');
+  panel.classList.toggle('open',open);
+}
+
+function createInvoiceDraft(){
+  var d=getOpsMetrics();
+  var msg=d.shipments.length?'Invoice draft prepared for '+d.shipments.length+' shipments at '+fmtMoney(d.revenue)+'.':'Add shipments before creating an invoice draft.';
+  addNotification('fa-file-invoice','rgba(59,130,246,.15)','var(--blue)',msg);
+  showToast(msg,d.shipments.length?'ok':'warn');
+  renderEnterpriseDashboard();
+}
+</script>
+
+<script>
+function collectAssistantData(){
+ var metrics=getOpsMetrics();
+ var shipments=metrics.shipments;
+ var fleet=metrics.fleet;
+ var employees=metrics.employees;
+ var pending=metrics.pending;
+ var delayed=shipments.filter(function(s){return String(s.status||'').toLowerCase().includes('delay')||String(s.status||'').toLowerCase().includes('cancel');});
+ var transit=shipments.filter(function(s){return String(s.status||'').toLowerCase().includes('transit');});
+ var delivered=shipments.filter(function(s){return String(s.status||'').toLowerCase().includes('deliver');});
+ var loading=shipments.filter(function(s){var st=String(s.status||'Loading').toLowerCase();return st.includes('loading')||st.includes('hold');});
+ var availableFleet=fleet.filter(function(v){var st=String(v.status||'Standby').toLowerCase();return st.includes('standby')||st.includes('operational');});
+ var fleetIssues=fleet.filter(function(v){var st=String(v.status||'').toLowerCase();return st.includes('maint')||st.includes('break');});
+ var drivers=employees.filter(function(e){return String(e.role||'').toLowerCase().includes('driver');});
+ return {shipments:shipments,fleet:fleet,employees:employees,pending:pending,delayed:delayed,transit:transit,delivered:delivered,loading:loading,availableFleet:availableFleet,fleetIssues:fleetIssues,drivers:drivers,revenue:metrics.revenue,expenses:metrics.expenses,onTime:metrics.onTime,routeEff:metrics.routeEff};
+}
+
+function plural(n,label){return n+' '+label+(n===1?'':'s');}
+
+function formatShipmentList(items){
+ if(!items.length)return 'No matching shipments found.';
+ return items.slice(0,4).map(function(s){return (s.id||'Shipment')+' '+(s.origin||'')+' to '+(s.dest||'')+' ('+(s.status||'Loading')+')';}).join('; ');
+}
+
+function updateAISuggestions(){
+ var list=document.getElementById('aiSuggestionList');
+ var d=collectAssistantData();
+ var suggestions=[];
+ if(d.shipments.length===0&&d.fleet.length===0&&d.employees.length===0){
+   suggestions.push(['Fresh terminal','Create the first admin account, then add shipments, fleet, and employees to activate live recommendations.']);
+ }else{
+   if(d.delayed.length>0)suggestions.push(['Delay watch',plural(d.delayed.length,'shipment')+' need attention: '+formatShipmentList(d.delayed)]);
+   if(d.availableFleet.length===0&&d.fleet.length>0)suggestions.push(['Fleet capacity','No standby vehicles are available. Review maintenance, breakdown, or in-transit units before adding new orders.']);
+   if(d.drivers.length===0)suggestions.push(['Crew setup','No drivers are registered yet. Add driver employees so orders can be assigned cleanly.']);
+   if(d.pending.length>0)suggestions.push(['Access approvals',plural(d.pending.length,'admin request')+' are waiting in Pending Approvals.']);
+   if(d.shipments.length>0&&d.delayed.length===0)suggestions.push(['Operations stable','No delayed shipments are currently recorded. Keep ETAs updated as new orders move.']);
+   if(d.revenue>0)suggestions.push(['Revenue vs expense','Projected margin is '+fmtMoney(d.revenue-d.expenses.total)+' after monthly operating expenses.']);
+   suggestions.push(['Today at a glance',plural(d.shipments.length,'shipment')+', '+plural(d.fleet.length,'fleet unit')+', '+plural(d.employees.length,'employee')+'.']);
+ }
+ var html=suggestions.slice(0,4).map(function(s){
+   return '<div class="ai-suggestion"><strong>'+escapeHtml(s[0])+'</strong>'+escapeHtml(s[1])+'</div>';
+ }).join('');
+ if(list)list.innerHTML=html;
+ var copilotList=document.getElementById('aiCopilotSuggestions');
+ if(copilotList)copilotList.innerHTML=html;
+}
+
+function askCopilot(promptText){
+ var input=document.getElementById('aiCopilotInput');
+ if(input){input.value=promptText;runSmartAssistant('aiCopilotInput','aiCopilotMessages');}
+}
+
+function runSmartAssistant(inputId,boxId){
+ inputId=inputId||'aiInput';
+ boxId=boxId||'aiMessages';
+ const input=document.getElementById(inputId);
+ const box=document.getElementById(boxId);
+ if(!input||!box)return;
+ const q=(input.value||'').toLowerCase();
+ if(!q.trim())return;
+ const d=collectAssistantData();
+ let reply='I could not find a direct match. Try asking for summary, delayed shipments, pending approvals, drivers, fleet, revenue, expenses, or route performance.';
+
+ if(q.includes('summary')){
+   reply='Summary: '+plural(d.shipments.length,'shipment')+', '+plural(d.transit.length,'in-transit shipment')+', '+plural(d.loading.length,'loading/on-hold shipment')+', '+plural(d.delivered.length,'delivered shipment')+', '+plural(d.delayed.length,'delayed shipment')+', '+plural(d.fleet.length,'fleet unit')+', '+plural(d.employees.length,'employee')+', revenue '+fmtMoney(d.revenue)+', expenses '+fmtMoney(d.expenses.total)+'.';
+ }else if(q.includes('delay')){
+   reply=d.delayed.length?('Delayed records: '+formatShipmentList(d.delayed)):('No delayed shipment records are currently saved.');
+ }else if(q.includes('pending')||q.includes('approval')){
+   reply=d.pending.length?(plural(d.pending.length,'admin request')+' pending approval. Review the Pending Approvals page.'):('No admin approvals are pending right now.');
+ }else if(q.includes('driver')){
+   reply=d.drivers.length?('Registered drivers: '+d.drivers.slice(0,6).map(function(e){return e.name||e.id;}).join(', ')+'.'):('No driver employees are registered yet.');
+ }else if(q.includes('fleet')||q.includes('vehicle')){
+   reply='Fleet: '+plural(d.fleet.length,'unit')+'. Available/standby: '+d.availableFleet.length+'. Maintenance or breakdown: '+d.fleetIssues.length+'.';
+ }else if(q.includes('employee')||q.includes('crew')){
+   reply='Crew: '+plural(d.employees.length,'employee')+' saved. Drivers: '+d.drivers.length+'.';
+ }else if(q.includes('shipment')||q.includes('order')){
+   reply=d.shipments.length?('Latest shipments: '+formatShipmentList(d.shipments.slice(-5).reverse())):('No shipments have been added yet.');
+ }else if(q.includes('revenue')||q.includes('income')){
+   reply='Projected monthly revenue is '+fmtMoney(d.revenue)+'. Margin after estimated expenses is '+fmtMoney(d.revenue-d.expenses.total)+'.';
+ }else if(q.includes('expense')||q.includes('cost')||q.includes('fuel')||q.includes('toll')){
+   reply='Estimated expenses: fuel '+fmtMoney(d.expenses.fuel)+', toll '+fmtMoney(d.expenses.toll)+', repairs '+fmtMoney(d.expenses.repairs)+', parking '+fmtMoney(d.expenses.parking)+'. Total '+fmtMoney(d.expenses.total)+'.';
+ }else if(q.includes('performance')||q.includes('on-time')||q.includes('route')){
+   reply='Delivery success rate is '+d.onTime+'%. Route efficiency is '+d.routeEff+'%. Delayed shipments: '+d.delayed.length+'.';
+ }
+
+ box.innerHTML += '<div class="ai-msg user">'+escapeHtml(input.value)+'</div>';
+ box.innerHTML += '<div class="ai-msg bot">'+escapeHtml(reply)+'</div>';
+ box.scrollTop = box.scrollHeight;
+ input.value='';
+ updateAISuggestions();
+ renderEnterpriseDashboard();
+}
+</script>
+
+</body>
+</html>
+
